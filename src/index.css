@@ -34,8 +34,8 @@
   --button-blue: oklch(0.6 0.15 240);
   --button-blue-hover: oklch(0.55 0.18 240);
   
-  --focus-ring-color: oklch(0.6 0.15 240);
-  --focus-ring-width: 2px;
+  --focus-ring-color: oklch(0.75 0 0);
+  --focus-ring-width: 3px;
   --selection-blue: #1a73e8;
 }
 
@@ -87,7 +87,9 @@ input[type="password"]:focus,
 textarea:focus,
 select:focus {
   border-color: var(--focus-ring-color) !important;
-  box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color) !important;
+  box-shadow: 0 0 0 var(--focus-ring-width) rgba(128, 128, 128, 0.15), 
+              0 0 8px rgba(128, 128, 128, 0.1),
+              0 0 16px rgba(128, 128, 128, 0.05) !important;
 }
 
 /* Text selection: blue everywhere (incl. inputs) */
