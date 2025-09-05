@@ -83,9 +83,9 @@ export function AuthCard() {
   if (currentStep === 'dashboard') {
     return (
       <motion.div
-        initial={{ scale: 0.98, opacity: 0 }}
+        initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
         className="min-h-screen flex items-center justify-center p-4"
       >
         <div className="text-center">
@@ -98,9 +98,9 @@ export function AuthCard() {
 
   return (
     <motion.div
-      initial={{ scale: 0.98, opacity: 0 }}
+      initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
       className="min-h-screen flex items-center justify-center p-4 relative"
     >
       {/* Navigation Button - Top Left */}
@@ -131,10 +131,10 @@ export function AuthCard() {
             {currentStep === 'email' && (
               <motion.div
                 key="email-step"
-                initial={{ x: 20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -20, opacity: 0 }}
-                transition={{ duration: 0.3 }}
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
               >
                 {/* Header */}
                 <div className="text-center mb-8">
@@ -244,10 +244,10 @@ export function AuthCard() {
             {currentStep === 'password' && (
               <motion.div
                 key="password-step"
-                initial={{ x: 20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -20, opacity: 0 }}
-                transition={{ duration: 0.3 }}
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
               >
                 {/* Header */}
                 <div className="text-center mb-8">
