@@ -96,7 +96,17 @@ export function AuthCard() {
           <div className="space-y-3">
             <Button
               onClick={() => handleOAuthLogin('discord')}
-              className="w-full h-12 bg-discord hover:bg-discord/90 text-white font-medium"
+              className="w-full h-12 text-white font-medium rounded-lg transition-colors duration-200"
+              style={{ 
+                backgroundColor: 'oklch(0.6 0.15 260)', 
+                borderRadius: '8px'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'oklch(0.55 0.18 260)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'oklch(0.6 0.15 260)'
+              }}
               disabled={isLoading}
             >
               <img src={discordIcon} alt="Discord" className="w-5 h-5 mr-3" />
@@ -106,7 +116,12 @@ export function AuthCard() {
             <Button
               onClick={() => handleOAuthLogin('google')}
               variant="outline"
-              className="w-full h-12 border-google-border hover:bg-accent font-medium"
+              className="w-full h-12 border-2 hover:bg-gray-50 font-medium rounded-lg transition-colors duration-200"
+              style={{ 
+                borderColor: 'oklch(0.85 0 0)', 
+                borderRadius: '8px',
+                backgroundColor: 'white'
+              }}
               disabled={isLoading}
             >
               <img src={googleIcon} alt="Google" className="w-5 h-5 mr-3" />
@@ -181,7 +196,21 @@ export function AuthCard() {
 
             <Button
               type="submit"
-              className="w-full h-12 font-medium"
+              className="w-full h-12 font-medium text-white rounded-lg transition-colors duration-200"
+              style={{ 
+                backgroundColor: 'oklch(0.6 0.15 240)', 
+                borderRadius: '8px'
+              }}
+              onMouseEnter={(e) => {
+                if (!isLoading) {
+                  e.currentTarget.style.backgroundColor = 'oklch(0.55 0.18 240)'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isLoading) {
+                  e.currentTarget.style.backgroundColor = 'oklch(0.6 0.15 240)'
+                }
+              }}
               disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Log in with Email"}

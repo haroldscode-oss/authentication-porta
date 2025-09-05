@@ -29,8 +29,10 @@
   --ring: oklch(0.2 0 0);
   --radius: 0.75rem;
   
-  --discord: oklch(0.6 0.2 270);
+  --discord: oklch(0.6 0.15 260);
   --google-border: oklch(0.85 0 0);
+  --button-blue: oklch(0.6 0.15 240);
+  --button-blue-hover: oklch(0.55 0.18 240);
 }
 
 @theme {
@@ -55,6 +57,8 @@
   --color-ring: var(--ring);
   --color-discord: var(--discord);
   --color-google-border: var(--google-border);
+  --color-button-blue: var(--button-blue);
+  --color-button-blue-hover: var(--button-blue-hover);
 
   --font-family-inter: 'Inter', ui-sans-serif, system-ui, sans-serif;
 
