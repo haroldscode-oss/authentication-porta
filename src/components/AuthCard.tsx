@@ -2,12 +2,13 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "sonner"
-import { ArrowRight, ArrowLeft, Eye, EyeSlash } from "@phosphor-icons/react"
+import { ArrowRight, ArrowLeft, Eye, EyeSlash, Phone, Envelope } from "@phosphor-icons/react"
 import ssLogo from "@/assets/images/Seller_Services_Logo.png"
 
 type AuthFlow = 'signin' | 'signup'
-type AuthStep = 'email' | 'password' | 'signup-form' | 'dashboard'
+type AuthStep = 'email' | 'password' | 'signup-form' | 'sms-verification' | 'welcome' | 'dashboard' | 'forgot-password' | 'reset-method' | 'reset-password'
 
 export function AuthCard() {
   const [authFlow, setAuthFlow] = useState<AuthFlow>('signin')
@@ -16,14 +17,56 @@ export function AuthCard() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [fullName, setFullName] = useState("")
+  const [phoneNumber, setPhoneNumber] = useState("")
+  const [smsCode, setSmsCode] = useState("")
+  const [resetMethod, setResetMethod] = useState<'email' | 'phone'>('email')
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [errors, setErrors] = useState<{email?: string; password?: string; confirmPassword?: string; fullName?: string}>({})
+  const [errors, setErrors] = useState<{
+    email?: string
+    password?: string
+    confirmPassword?: string
+    fullName?: string
+    phoneNumber?: string
+    smsCode?: string
+    terms?: string
+  }>({})
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     return emailRegex.test(email)
+  }
+
+  const validatePhone = (phone: string) => {
+    const phoneRegex = /^\+?[1-9]\d{1,14}$/
+    return phoneRegex.test(phone.replace(/\s+/g, ''))
+  }
+
+  const handleOAuthLogin = (provider: 'discord' | 'google') => {
+    setIsLoading(true)
+    
+    // Simulate OAuth flow
+    setTimeout(() => {
+      const isNewUser = Math.random() > 0.5
+      
+      if (isNewUser) {
+        // New user - show create account flow
+        setEmail(`user@${provider}.com`) // Prefilled from OAuth
+        setAuthFlow('signup')
+        setCurrentStep('signup-form')
+        toast.message(`Welcome! Let's set up your ${provider} account.`)
+      } else {
+        // Existing user - show logo animation then dashboard
+        setCurrentStep('welcome')
+        toast.success(`Signed in with ${provider}!`)
+        setTimeout(() => {
+          setCurrentStep('dashboard')
+        }, 2500)
+      }
+      setIsLoading(false)
+    }, 1500)
   }
 
   const handleEmailContinue = () => {
@@ -67,8 +110,18 @@ export function AuthCard() {
     e.preventDefault()
     setErrors({})
     
-    if (!fullName) {
+    if (!fullName.trim()) {
       setErrors({ fullName: "Full name is required" })
+      return
+    }
+    
+    if (!phoneNumber.trim()) {
+      setErrors({ phoneNumber: "Phone number is required" })
+      return
+    }
+    
+    if (!validatePhone(phoneNumber)) {
+      setErrors({ phoneNumber: "Please enter a valid phone number" })
       return
     }
     
@@ -87,15 +140,46 @@ export function AuthCard() {
       return
     }
     
+    if (!acceptedTerms) {
+      setErrors({ terms: "You must accept the Terms of Service" })
+      return
+    }
+    
     setIsLoading(true)
     
-    // Simulate account creation
+    // Simulate account creation and SMS sending
     try {
       await new Promise(resolve => setTimeout(resolve, 2000))
-      toast.success("Account created successfully!")
-      setCurrentStep('dashboard')
+      toast.success("Verification code sent to your phone!")
+      setCurrentStep('sms-verification')
     } catch (error) {
       toast.error("Failed to create account")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleSmsVerification = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setErrors({})
+    
+    if (!smsCode || smsCode.length !== 6) {
+      setErrors({ smsCode: "Please enter the 6-digit code" })
+      return
+    }
+    
+    setIsLoading(true)
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      toast.success("Phone verified successfully!")
+      setCurrentStep('welcome')
+      setTimeout(() => {
+        setCurrentStep('dashboard')
+      }, 2500)
+    } catch (error) {
+      toast.error("Invalid verification code")
+      setErrors({ smsCode: "Invalid verification code" })
     } finally {
       setIsLoading(false)
     }
@@ -121,7 +205,10 @@ export function AuthCard() {
     try {
       await new Promise(resolve => setTimeout(resolve, 2000))
       toast.success("Successfully logged in!")
-      setCurrentStep('dashboard')
+      setCurrentStep('welcome')
+      setTimeout(() => {
+        setCurrentStep('dashboard')
+      }, 2500)
     } catch (error) {
       toast.error("Invalid password")
       setErrors({ password: "Invalid password" })
@@ -130,9 +217,28 @@ export function AuthCard() {
     }
   }
 
-  const handleOAuthLogin = (provider: 'discord' | 'google') => {
-    // OAuth redirect would happen here
-    window.location.href = `/auth/${provider}`
+  const handleForgotPassword = () => {
+    setCurrentStep('reset-method')
+  }
+
+  const handleResetMethod = (method: 'email' | 'phone') => {
+    setResetMethod(method)
+    setCurrentStep('reset-password')
+  }
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      toast.success(`Reset link sent to your ${resetMethod}!`)
+      setCurrentStep('email')
+    } catch (error) {
+      toast.error("Failed to send reset link")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const goBack = () => {
@@ -141,6 +247,15 @@ export function AuthCard() {
       setErrors({})
     } else if (currentStep === 'signup-form') {
       setCurrentStep('email')
+      setErrors({})
+    } else if (currentStep === 'sms-verification') {
+      setCurrentStep('signup-form')
+      setErrors({})
+    } else if (currentStep === 'reset-method') {
+      setCurrentStep('password')
+      setErrors({})
+    } else if (currentStep === 'reset-password') {
+      setCurrentStep('reset-method')
       setErrors({})
     }
   }
@@ -158,6 +273,83 @@ export function AuthCard() {
     setPassword("")
     setConfirmPassword("")
     setFullName("")
+    setPhoneNumber("")
+    setSmsCode("")
+    setAcceptedTerms(false)
+  }
+
+  // Welcome Animation Component
+  if (currentStep === 'welcome') {
+    return (
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ 
+          duration: 0.8, 
+          ease: "easeOut",
+          type: "spring",
+          stiffness: 60,
+          damping: 15
+        }}
+        className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100"
+      >
+        <motion.div
+          initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+          className="text-center"
+        >
+          <motion.div
+            initial={{ scale: 0.5, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ 
+              delay: 0.1, 
+              duration: 1, 
+              type: "spring", 
+              stiffness: 100,
+              damping: 12
+            }}
+            className="mb-8"
+          >
+            <img 
+              src={ssLogo} 
+              alt="SS Logo" 
+              className="w-32 h-32 mx-auto object-contain" 
+              style={{
+                filter: 'drop-shadow(rgba(0, 0, 0, 0.1) 0px 20px 30px) drop-shadow(rgba(59, 130, 246, 0.3) 0px 0px 40px)'
+              }}
+            />
+          </motion.div>
+          
+          <motion.h1
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            className="text-4xl font-bold text-gray-800 mb-4"
+          >
+            Welcome to Seller Services!
+          </motion.h1>
+          
+          <motion.p
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.8, duration: 0.5 }}
+            className="text-lg text-gray-600"
+          >
+            You're all set. Let's get started!
+          </motion.p>
+          
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 1.2, duration: 0.4, type: "spring" }}
+            className="mt-8"
+          >
+            <div className="w-16 h-1 bg-blue-500 mx-auto rounded-full" />
+          </motion.div>
+        </motion.div>
+      </motion.div>
+    )
   }
 
   if (currentStep === 'dashboard') {
@@ -178,19 +370,19 @@ export function AuthCard() {
 
   return (
     <motion.div
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
+      initial={{ scale: 0.8, opacity: 0, y: 30 }}
+      animate={{ scale: 1, opacity: 1, y: 0 }}
       transition={{ 
-        duration: 0.6, 
-        ease: "easeOut",
+        duration: 0.4, 
+        ease: [0.23, 1, 0.32, 1],
         type: "spring",
-        stiffness: 80,
-        damping: 20
+        stiffness: 300,
+        damping: 30
       }}
       className="min-h-screen flex items-center justify-center p-4 relative"
     >
       {/* Navigation Button - Top Left */}
-      {(currentStep === 'password' || currentStep === 'signup-form') && (
+      {(currentStep === 'password' || currentStep === 'signup-form' || currentStep === 'sms-verification' || currentStep === 'reset-method' || currentStep === 'reset-password') && (
         <motion.div
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -235,14 +427,12 @@ export function AuthCard() {
             {currentStep === 'email' && (
               <motion.div
                 key="email-step"
-                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                initial={{ scale: 0.95, opacity: 0, y: 10 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.9, opacity: 0, y: -20 }}
+                exit={{ scale: 0.95, opacity: 0, y: -10 }}
                 transition={{ 
-                  duration: 0.5, 
-                  ease: "easeOut",
-                  type: "spring",
-                  stiffness: 100
+                  duration: 0.3, 
+                  ease: [0.23, 1, 0.32, 1]
                 }}
               >
                 {/* Header */}
@@ -355,14 +545,12 @@ export function AuthCard() {
             {currentStep === 'password' && (
               <motion.div
                 key="password-step"
-                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                initial={{ scale: 0.95, opacity: 0, y: 10 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.9, opacity: 0, y: -20 }}
+                exit={{ scale: 0.95, opacity: 0, y: -10 }}
                 transition={{ 
-                  duration: 0.5, 
-                  ease: "easeOut",
-                  type: "spring",
-                  stiffness: 100
+                  duration: 0.3, 
+                  ease: [0.23, 1, 0.32, 1]
                 }}
               >
                 {/* Header */}
@@ -423,9 +611,13 @@ export function AuthCard() {
 
                 {/* Forgot Password */}
                 <div className="mt-4 text-center">
-                  <a href="#" className="text-sm text-blue-600 hover:text-blue-700 transition-colors">
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    className="text-sm text-blue-600 hover:text-blue-700 transition-colors"
+                  >
                     Forgot password?
-                  </a>
+                  </button>
                 </div>
               </motion.div>
             )}
@@ -433,14 +625,12 @@ export function AuthCard() {
             {currentStep === 'signup-form' && (
               <motion.div
                 key="signup-step"
-                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                initial={{ scale: 0.95, opacity: 0, y: 10 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.9, opacity: 0, y: -20 }}
+                exit={{ scale: 0.95, opacity: 0, y: -10 }}
                 transition={{ 
-                  duration: 0.5, 
-                  ease: "easeOut",
-                  type: "spring",
-                  stiffness: 100
+                  duration: 0.3, 
+                  ease: [0.23, 1, 0.32, 1]
                 }}
               >
                 {/* Header */}
@@ -480,6 +670,21 @@ export function AuthCard() {
                     />
                     {errors.fullName && (
                       <p className="text-sm text-red-600 mt-1">{errors.fullName}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <Input
+                      id="phoneNumber"
+                      type="tel"
+                      placeholder="Phone number (e.g., +1234567890)"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      className="h-12 bg-white border border-slate-200 rounded-xl shadow-sm"
+                      disabled={isLoading}
+                    />
+                    {errors.phoneNumber && (
+                      <p className="text-sm text-red-600 mt-1">{errors.phoneNumber}</p>
                     )}
                   </div>
 
@@ -526,6 +731,30 @@ export function AuthCard() {
                       <p className="text-sm text-red-600 mt-1">{errors.confirmPassword}</p>
                     )}
                   </div>
+
+                  {/* Terms of Service Checkbox */}
+                  <div className="flex items-start space-x-3 pt-2">
+                    <Checkbox
+                      id="terms"
+                      checked={acceptedTerms}
+                      onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
+                      className="mt-1"
+                      disabled={isLoading}
+                    />
+                    <label htmlFor="terms" className="text-sm text-muted-foreground leading-normal cursor-pointer">
+                      I agree to the{" "}
+                      <a href="#" className="text-blue-600 hover:text-blue-700 underline">
+                        Terms of Service
+                      </a>{" "}
+                      and{" "}
+                      <a href="#" className="text-blue-600 hover:text-blue-700 underline">
+                        Privacy Policy
+                      </a>
+                    </label>
+                  </div>
+                  {errors.terms && (
+                    <p className="text-sm text-red-600">{errors.terms}</p>
+                  )}
                   
                   <Button
                     type="submit"
@@ -535,19 +764,185 @@ export function AuthCard() {
                     {isLoading ? "Creating account..." : "Create account"}
                   </Button>
                 </form>
+              </motion.div>
+            )}
 
-                {/* Terms */}
-                <div className="mt-4 text-center">
-                  <p className="text-xs text-muted-foreground">
-                    By creating an account, you agree to our{" "}
-                    <a href="#" className="underline hover:text-foreground transition-colors">
-                      Terms of Service
-                    </a>{" "}
-                    and{" "}
-                    <a href="#" className="underline hover:text-foreground transition-colors">
-                      Privacy Policy
-                    </a>
+            {currentStep === 'sms-verification' && (
+              <motion.div
+                key="sms-step"
+                initial={{ scale: 0.95, opacity: 0, y: 10 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.95, opacity: 0, y: -10 }}
+                transition={{ 
+                  duration: 0.3, 
+                  ease: [0.23, 1, 0.32, 1]
+                }}
+              >
+                {/* Header */}
+                <div className="text-center mb-8">
+                  <div className="inline-block mb-4" style={{
+                    filter: 'drop-shadow(rgba(0, 0, 0, 0.3) 2px 2px 4px) drop-shadow(rgba(255, 255, 255, 0.3) 0px 0px 8px)',
+                    textShadow: 'rgba(0, 0, 0, 0.3) 2px 2px 4px, rgba(255, 255, 255, 0.3) -1px -1px 2px'
+                  }}>
+                    <Phone size={48} className="mx-auto text-blue-600" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-card-foreground mb-2">
+                    Verify your phone
+                  </h2>
+                  <p className="text-muted-foreground text-sm">
+                    Enter the 6-digit code sent to<br />
+                    <span className="font-medium">{phoneNumber}</span>
                   </p>
+                </div>
+
+                {/* SMS Code Form */}
+                <form onSubmit={handleSmsVerification} className="space-y-4">
+                  <div>
+                    <Input
+                      id="smsCode"
+                      type="text"
+                      placeholder="000000"
+                      value={smsCode}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '').slice(0, 6)
+                        setSmsCode(value)
+                      }}
+                      className="h-12 bg-white border border-slate-200 rounded-xl shadow-sm text-center text-lg font-mono tracking-widest"
+                      disabled={isLoading}
+                      maxLength={6}
+                    />
+                    {errors.smsCode && (
+                      <p className="text-sm text-red-600 mt-1">{errors.smsCode}</p>
+                    )}
+                  </div>
+                  
+                  <Button
+                    type="submit"
+                    className="w-full h-12 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-all duration-200 shadow-lg"
+                    disabled={isLoading || smsCode.length !== 6}
+                  >
+                    {isLoading ? "Verifying..." : "Verify code"}
+                  </Button>
+                </form>
+
+                {/* Resend Code */}
+                <div className="mt-4 text-center">
+                  <button
+                    type="button"
+                    onClick={() => toast.success("Verification code resent!")}
+                    className="text-sm text-blue-600 hover:text-blue-700 transition-colors"
+                    disabled={isLoading}
+                  >
+                    Didn't receive code? Resend
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {currentStep === 'reset-method' && (
+              <motion.div
+                key="reset-method-step"
+                initial={{ scale: 0.95, opacity: 0, y: 10 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.95, opacity: 0, y: -10 }}
+                transition={{ 
+                  duration: 0.3, 
+                  ease: [0.23, 1, 0.32, 1]
+                }}
+              >
+                {/* Header */}
+                <div className="text-center mb-8">
+                  <div className="inline-block mb-4" style={{
+                    filter: 'drop-shadow(rgba(0, 0, 0, 0.3) 2px 2px 4px) drop-shadow(rgba(255, 255, 255, 0.3) 0px 0px 8px)',
+                    textShadow: 'rgba(0, 0, 0, 0.3) 2px 2px 4px, rgba(255, 255, 255, 0.3) -1px -1px 2px'
+                  }}>
+                    <img 
+                      src={ssLogo} 
+                      alt="SS Logo" 
+                      className="w-16 h-16 mx-auto object-contain" 
+                      style={{
+                        filter: 'drop-shadow(rgba(0, 0, 0, 0.04) 0px 10px 8px) drop-shadow(rgba(0, 0, 0, 0.1) 0px 4px 3px)'
+                      }}
+                    />
+                  </div>
+                  <h2 className="text-2xl font-bold text-card-foreground mb-2">
+                    Reset password
+                  </h2>
+                  <p className="text-muted-foreground text-sm">
+                    How would you like to reset your password?
+                  </p>
+                </div>
+
+                {/* Reset Method Options */}
+                <div className="space-y-3">
+                  <Button
+                    onClick={() => handleResetMethod('email')}
+                    className="w-full h-12 bg-white border border-slate-200 text-slate-900 rounded-xl font-medium hover:bg-gray-50 transition-all duration-200 shadow-sm flex items-center justify-center gap-3"
+                  >
+                    <Envelope size={20} />
+                    Send reset link via Email
+                  </Button>
+                  
+                  <Button
+                    onClick={() => handleResetMethod('phone')}
+                    className="w-full h-12 bg-white border border-slate-200 text-slate-900 rounded-xl font-medium hover:bg-gray-50 transition-all duration-200 shadow-sm flex items-center justify-center gap-3"
+                  >
+                    <Phone size={20} />
+                    Send reset code via SMS
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
+            {currentStep === 'reset-password' && (
+              <motion.div
+                key="reset-password-step"
+                initial={{ scale: 0.95, opacity: 0, y: 10 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.95, opacity: 0, y: -10 }}
+                transition={{ 
+                  duration: 0.3, 
+                  ease: [0.23, 1, 0.32, 1]
+                }}
+              >
+                {/* Header */}
+                <div className="text-center mb-8">
+                  <div className="inline-block mb-4">
+                    {resetMethod === 'email' ? (
+                      <Envelope size={48} className="mx-auto text-blue-600" />
+                    ) : (
+                      <Phone size={48} className="mx-auto text-blue-600" />
+                    )}
+                  </div>
+                  <h2 className="text-2xl font-bold text-card-foreground mb-2">
+                    Check your {resetMethod}
+                  </h2>
+                  <p className="text-muted-foreground text-sm">
+                    We'll send a reset {resetMethod === 'email' ? 'link' : 'code'} to<br />
+                    <span className="font-medium">{resetMethod === 'email' ? email : phoneNumber}</span>
+                  </p>
+                </div>
+
+                {/* Reset Form */}
+                <form onSubmit={handlePasswordReset} className="space-y-4">
+                  <Button
+                    type="submit"
+                    className="w-full h-12 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-all duration-200 shadow-lg"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Sending..." : `Send reset ${resetMethod === 'email' ? 'link' : 'code'}`}
+                  </Button>
+                </form>
+
+                {/* Back to sign in */}
+                <div className="mt-4 text-center">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentStep('email')}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Back to sign in
+                  </button>
                 </div>
               </motion.div>
             )}

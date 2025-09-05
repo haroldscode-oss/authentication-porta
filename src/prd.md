@@ -1,234 +1,128 @@
-# Product Requirements Document (PRD): Authentication System for Seller Services
+# Product Requirements Document
+## Seller Services Authentication System
 
-## Core Purpose & Success
+### Core Purpose & Success
 
-**Mission Statement**: Create a secure, user-friendly authentication system that allows users to sign in to Seller Services using email/password or OAuth providers (Google, Discord).
+**Mission Statement**: Create a comprehensive, user-friendly authentication system for Seller Services that handles both email/password and OAuth flows with SMS verification for new accounts.
 
-**Success Indicators**: 
-- Users can successfully create accounts and sign in
-- Multi-step email flow provides clear guidance for new vs existing users
-- OAuth integration works seamlessly
-- Password reset functionality is reliable
-- Authentication state persists across sessions
+**Success Indicators**:
+- Seamless user onboarding with minimal friction
+- Secure account creation with phone verification
+- Multiple authentication paths (OAuth + Email/Password)
+- Smooth password recovery process
+- Professional, trustworthy visual design
 
-**Experience Qualities**: Secure, Intuitive, Professional
+**Experience Qualities**: Trustworthy, Smooth, Professional
 
-## Project Classification & Approach
+### Project Classification & Approach
 
-**Complexity Level**: Light Application (multiple features with basic state)
-**Primary User Activity**: Acting (authentication actions)
+**Complexity Level**: Light Application (multiple features with state management)
+**Primary User Activity**: Acting (authentication and account management)
 
-## Core Problem Analysis
+### Essential Features
 
-Users need a secure way to access their Seller Services account. The system must handle both new user registration and existing user authentication while providing OAuth alternatives for convenience.
+#### 1. OAuth Authentication (Discord & Google)
+- **Functionality**: One-click sign-in with social providers
+- **Purpose**: Reduce friction for users with existing accounts
+- **Success Criteria**: Immediate redirect and account creation/sign-in
 
-## Essential Features
+#### 2. Email-Based Authentication
+- **Functionality**: Email/password sign-in with account existence checking
+- **Purpose**: Traditional authentication for users preferring email
+- **Success Criteria**: Smooth flow between email entry and password/signup
 
-### 1. Multi-Step Email Authentication
-- **Email Check**: Determines if user exists and routes to appropriate flow
-- **Password Entry**: For existing users with forgotten password option
-- **Account Creation**: For new users with password strength validation
-- **Purpose**: Provides personalized experience based on user status
-- **Success Criteria**: Correct routing based on email existence
+#### 3. New User Registration
+- **Functionality**: Full name, phone number, password with TOS acceptance
+- **Purpose**: Collect essential user information and verify identity
+- **Success Criteria**: Complete signup with SMS verification
 
-### 2. OAuth Integration
-- **Google OAuth**: Sign in with Google account
-- **Discord OAuth**: Sign in with Discord account  
-- **Purpose**: Provides convenient alternative to email/password
-- **Success Criteria**: Successful authentication and account linking
+#### 4. SMS Verification
+- **Functionality**: 6-digit code verification via phone
+- **Purpose**: Verify phone number ownership and enhance security
+- **Success Criteria**: Successful phone verification within 3 attempts
 
-### 3. Password Management
-- **Password Reset**: Email-based password reset flow
-- **Password Strength**: Real-time validation and visual feedback
-- **Purpose**: Secure password handling and recovery
-- **Success Criteria**: Users can reset forgotten passwords and create secure ones
+#### 5. Password Recovery
+- **Functionality**: Reset via email or SMS with method selection
+- **Purpose**: Help users regain access to their accounts
+- **Success Criteria**: Successful password reset within 5 minutes
 
-### 4. Session Management
-- **Persistent Sessions**: Sessions survive page refreshes
-- **Secure Storage**: Uses Spark KV for session persistence
-- **Purpose**: Maintains user authentication state
-- **Success Criteria**: Users remain logged in across sessions
+#### 6. Welcome Animation
+- **Functionality**: Celebratory animation after successful signup/signin
+- **Purpose**: Create positive first impression and sense of accomplishment
+- **Success Criteria**: Smooth transition to dashboard
 
-## Design Direction
+### Design Direction
 
-### Visual Tone & Identity
-**Emotional Response**: Professional confidence and security
-**Design Personality**: Clean, modern, trustworthy
-**Visual Metaphors**: Clean forms, subtle shadows, professional branding
-**Simplicity Spectrum**: Minimal interface focusing on essential actions
+#### Visual Tone & Identity
+**Emotional Response**: Users should feel confident, secure, and welcomed
+**Design Personality**: Clean, professional, modern with subtle elegance
+**Visual Metaphors**: Clean forms, gentle shadows, glassmorphic effects
+**Simplicity Spectrum**: Minimal interface with clear visual hierarchy
 
-### Color Strategy
-**Color Scheme Type**: Custom palette with brand colors
-**Primary Colors**:
-- Background: Pure white (`oklch(1 0 0)`)
-- Card: Off-white (`oklch(0.98 0 0)`)
-- Text: Dark gray (`oklch(0.2 0 0)`)
+#### Color Strategy
+**Color Scheme Type**: Monochromatic with blue accents
+**Primary Color**: White/light gray for cleanliness and trust
+**Secondary Colors**: Soft grays for subtle contrast
+**Accent Color**: Blue (#5865F2 for Discord, #4285F4 for Google)
+**Color Psychology**: White conveys cleanliness and trust, blue suggests reliability
 
-**Secondary Colors**:
-- Discord: `#5865F2` (brand color)
-- Google: White with gray border
-- Blue accent: `oklch(0.6 0.15 240)` for primary actions
+#### Typography System
+**Font Pairing Strategy**: Single font family (Inter) with multiple weights
+**Typographic Hierarchy**: Clear distinction between headers, body, and labels
+**Font Personality**: Modern, clean, highly legible
+**Readability Focus**: Adequate line spacing and contrast for all text sizes
+**Which fonts**: Inter (400, 500, 600 weights)
 
-**Accent Colors**:
-- Success: Green for password requirements
-- Warning: Yellow/red for password strength
-- Error: Red for validation errors
+#### Animation & Interactions
+**Purposeful Meaning**: Smooth transitions convey polish and professionalism
+**Hierarchy of Movement**: Card entrance gets primary animation focus
+**Contextual Appropriateness**: Subtle, purposeful animations that enhance UX
 
-### Typography System
-**Font Selection**: Inter (Google Font) - modern, readable sans-serif
-**Hierarchy**:
-- H2 (24px): Page titles ("Seller Services")
-- H3 (20px): Section titles ("Enter your password")
-- Body (14px): Form inputs and labels
-- Small (12px): Helper text and legal copy
-
-### Visual Hierarchy & Layout
-**Card-Based Layout**: Centered authentication card with 3D styling
-**Form Organization**: Logical flow from OAuth → divider → email/password
-**Spacing**: Generous whitespace with consistent 8px grid system
-**Progressive Disclosure**: Show only relevant fields per step
-
-### Animations
-**Purpose**: Smooth transitions between authentication steps
-**Card Entrance**: Scale and fade in animation
-**Button States**: Hover and loading state transitions
-**Form Validation**: Smooth error state changes
-
-### UI Components & Styling
-**Component Usage**:
-- Shadcn Button components for all actions
-- Shadcn Input with custom styling for form fields
-- Shadcn Checkbox for terms agreement
-- Custom password strength indicator
-- Phosphor Icons for visual elements
-
-**Brand Styling**:
-- 3D card effect with inset shadows
-- Rounded corners (12px radius)
-- Seller Services logo with drop shadows
-- Consistent button heights (48px)
-
-## Authentication Flow Architecture
-
-### Email-First Flow
-1. **Initial Screen**: OAuth buttons + email input
-2. **Email Check**: Determine if user exists
-3. **Route Decision**: 
-   - Existing user → Password entry
-   - New user → Registration form
-4. **Authentication**: Complete login/registration
-5. **Session Creation**: Establish persistent session
-
-### OAuth Flow
-1. **Provider Selection**: Click Google/Discord button
-2. **OAuth Redirect**: Redirect to provider
-3. **Callback Handling**: Process OAuth response
-4. **Account Linking**: Link to existing email or create new account
-5. **Session Creation**: Establish persistent session
-
-### Password Reset Flow
-1. **Forgot Password**: Enter email address
-2. **Email Sent**: Confirmation message (prevents enumeration)
-3. **Reset Link**: Token-based password reset
-4. **New Password**: Password creation with validation
-5. **Auto Login**: Automatic login after successful reset
-
-## Security Features
-
-### Password Security
-- BCrypt hashing with 12 rounds
-- Minimum 8 characters with letter + number requirement
-- Visual password strength indicator
-- Secure password reset tokens with 30-minute expiry
-
-### Session Security
-- Secure session tokens with configurable expiry
-- Session validation on each request
-- Automatic cleanup of expired sessions
-
-### Rate Limiting
-- 5 attempts per 15-minute window for login attempts
-- Prevents brute force attacks
-- Graceful error messaging
-
-### Data Protection
-- Email normalization (lowercase, trimmed)
-- CSRF protection for all forms
-- Secure token generation for all verification flows
-
-## Technical Implementation
-
-### Authentication Service
-- Centralized `AuthService` class using Spark KV storage
-- Type-safe interfaces for all authentication data
-- Comprehensive error handling and validation
-
-### State Management
-- React Context for authentication state
-- Persistent session storage using Spark KV
-- Reactive updates across components
-
-### Form Validation
-- Real-time email and password validation
-- Clear error messaging
-- Visual feedback for password strength
-
-## Accessibility & Usability
-
-### Accessibility Features
-- WCAG AA contrast compliance
-- Keyboard navigation support
-- Screen reader friendly form labels
-- Focus indicators for all interactive elements
-
-### Error Handling
-- Clear, actionable error messages
-- Graceful fallbacks for network issues
-- Loading states for all async operations
+#### UI Elements & Component Selection
+**Component Usage**: 
+- Shadcn buttons for consistent styling
+- Custom input fields with focus states
+- Checkbox for TOS acceptance
 - Toast notifications for feedback
 
-## Edge Cases & Scenarios
+**Component States**: Hover, focus, loading, and error states for all interactive elements
+**Spacing System**: Consistent 4px grid with generous white space
+**Mobile Adaptation**: Responsive design with appropriate touch targets
 
-### Network Issues
-- Offline state handling
-- Request timeout management
-- Retry mechanisms for failed requests
+### Authentication Flow Map
 
-### OAuth Failures
-- Provider service unavailable
-- User cancels OAuth flow
-- Invalid OAuth configuration
+1. **Initial Entry**: Logo splash animation → Auth card
+2. **Email Path**: 
+   - Enter email → Check existence
+   - If exists: Password screen → Sign in → Welcome → Dashboard
+   - If new: Signup form → SMS verification → Welcome → Dashboard
+3. **OAuth Path**:
+   - Provider selection → OAuth redirect
+   - If exists: Welcome → Dashboard  
+   - If new: Prefilled signup → SMS verification → Welcome → Dashboard
+4. **Forgot Password**: Method selection → Reset delivery → Return to signin
 
-### Security Scenarios
-- Rate limiting activation
-- Expired session handling
-- Invalid token management
+### Technical Implementation Notes
 
-## Success Metrics
+- Form validation with real-time feedback
+- Smooth page transitions using Framer Motion
+- Responsive design for all screen sizes
+- Accessibility considerations (ARIA labels, keyboard navigation)
+- Error handling with constructive messaging
+- Loading states for all async operations
 
-### Technical Metrics
-- Authentication success rate > 95%
-- Session persistence reliability
-- Password reset completion rate
-- OAuth conversion rate
+### Security Considerations
 
-### User Experience Metrics
-- Time to complete authentication
-- Error rate per authentication attempt
-- User satisfaction with flow clarity
+- Phone number validation
+- Password strength requirements (minimum 6 characters)
+- Terms of Service acceptance requirement
+- SMS code expiration and retry limits
+- Secure handling of user credentials
 
-## Future Enhancements
+### Success Metrics
 
-### Planned Features
-- Email verification for new accounts
-- Two-factor authentication
-- Social account linking management
-- Remember device functionality
-
-### Security Improvements
-- Suspicious activity detection
-- Device fingerprinting
-- Enhanced rate limiting
-- Audit logging
-
-This authentication system provides a solid foundation for Seller Services with room for future security and feature enhancements.
+- Authentication completion rate > 90%
+- Average time to complete signup < 3 minutes
+- SMS verification success rate > 95%
+- User satisfaction with onboarding experience
+- Minimal support tickets for authentication issues
