@@ -904,7 +904,7 @@ export function AuthCard() {
                     className="w-full h-12 bg-white border border-slate-200 text-slate-900 rounded-xl font-medium hover:bg-gray-50 transition-all duration-200 shadow-sm flex items-center justify-center gap-3"
                   >
                     <Envelope size={20} />
-                    Send reset link via Email
+                    Send reset code via Email
                   </Button>
                   
                   <Button
@@ -954,7 +954,7 @@ export function AuthCard() {
                     className="w-full h-12 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-all duration-200 shadow-lg"
                     disabled={isLoading}
                   >
-                    {isLoading ? "Sending..." : `Send reset ${resetMethod === 'email' ? 'link' : 'code'}`}
+                    {isLoading ? "Sending..." : "Send reset code via Email"}
                   </Button>
                 </form>
 
