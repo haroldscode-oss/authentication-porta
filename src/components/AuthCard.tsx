@@ -44,26 +44,42 @@ export function AuthCard() {
     return phoneRegex.test(phone.replace(/\s+/g, ''))
   }
 
+  // Predefined test credentials
+  const testAccounts = {
+    existing: ['account@example.com', 'account@gmail.com'],
+    new: ['new@example.com'],
+    discord: ['discord@example.com']
+  }
+
+  const checkAccountStatus = (email: string) => {
+    if (testAccounts.existing.includes(email)) return 'existing'
+    if (testAccounts.new.includes(email)) return 'new'
+    if (testAccounts.discord.includes(email)) return 'discord'
+    return 'unknown'
+  }
+
   const handleOAuthLogin = (provider: 'discord' | 'google') => {
     setIsLoading(true)
     
     // Simulate OAuth flow
     setTimeout(() => {
-      const isNewUser = Math.random() > 0.5
+      const oauthEmail = `user@${provider}.com` // Simulated OAuth email
+      const accountStatus = checkAccountStatus(oauthEmail)
       
-      if (isNewUser) {
-        // New user - show create account flow
-        setEmail(`user@${provider}.com`) // Prefilled from OAuth
-        setAuthFlow('signup')
-        setCurrentStep('signup-form')
-        toast.message(`Welcome! Let's set up your ${provider} account.`)
-      } else {
-        // Existing user - show logo animation then dashboard
+      if (accountStatus === 'existing' || provider === 'discord') {
+        // Existing user or Discord auth - show logo animation then dashboard
+        setEmail(oauthEmail)
         setCurrentStep('welcome')
         toast.success(`Signed in with ${provider}!`)
         setTimeout(() => {
           setCurrentStep('dashboard')
         }, 2500)
+      } else {
+        // New user - show create account flow
+        setEmail(oauthEmail) // Prefilled from OAuth
+        setAuthFlow('signup')
+        setCurrentStep('signup-form')
+        toast.message(`Welcome! Let's set up your ${provider} account.`)
       }
       setIsLoading(false)
     }, 1500)
@@ -82,28 +98,37 @@ export function AuthCard() {
       return
     }
     
-    // Simulate checking if account exists
-    const accountExists = Math.random() > 0.5 // Random for demo
+    setIsLoading(true)
     
-    if (accountExists && authFlow === 'signin') {
-      setCurrentStep('password')
-      toast.success("Account found! Please enter your password.")
-    } else if (!accountExists && authFlow === 'signin') {
-      // Switch to signup flow if account doesn't exist
-      setAuthFlow('signup')
-      setCurrentStep('signup-form')
-      toast.message("No account found. Let's create one for you!")
-    } else if (authFlow === 'signup') {
-      // If email exists during signup, redirect to signin
-      if (accountExists) {
-        setAuthFlow('signin')
+    // Simulate checking account status
+    setTimeout(() => {
+      const accountStatus = checkAccountStatus(email.toLowerCase())
+      
+      if (accountStatus === 'existing') {
+        // Account exists - go to password screen
         setCurrentStep('password')
-        toast.message("Account already exists. Please sign in.")
-      } else {
+        toast.success("Account found! Please enter your password.")
+      } else if (accountStatus === 'new') {
+        // New user - go to signup form with email prefilled
+        setAuthFlow('signup')
         setCurrentStep('signup-form')
-        toast.success("Great! Let's set up your account.")
+        toast.message("Let's create your account!")
+      } else if (accountStatus === 'discord') {
+        // Discord OAuth user - redirect to Discord auth
+        toast.message("We found a Discord account! Redirecting...")
+        setTimeout(() => {
+          handleOAuthLogin('discord')
+        }, 1000)
+        return // Don't reset loading here as OAuth will handle it
+      } else {
+        // Unknown email - treat as new user for now
+        setAuthFlow('signup')
+        setCurrentStep('signup-form')
+        toast.message("Let's create your account!")
       }
-    }
+      
+      setIsLoading(false)
+    }, 800)
   }
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -201,17 +226,24 @@ export function AuthCard() {
     
     setIsLoading(true)
     
-    // Simulate authentication
+    // Simulate authentication - for test accounts, accept any 6+ char password
     try {
       await new Promise(resolve => setTimeout(resolve, 2000))
-      toast.success("Successfully logged in!")
-      setCurrentStep('welcome')
-      setTimeout(() => {
-        setCurrentStep('dashboard')
-      }, 2500)
+      const accountStatus = checkAccountStatus(email.toLowerCase())
+      
+      if (accountStatus === 'existing') {
+        toast.success("Successfully logged in!")
+        setCurrentStep('welcome')
+        setTimeout(() => {
+          setCurrentStep('dashboard')
+        }, 2500)
+      } else {
+        // Invalid account for password login
+        throw new Error("Account not found")
+      }
     } catch (error) {
-      toast.error("Invalid password")
-      setErrors({ password: "Invalid password" })
+      toast.error("Invalid email or password")
+      setErrors({ password: "Invalid email or password" })
     } finally {
       setIsLoading(false)
     }
@@ -258,24 +290,6 @@ export function AuthCard() {
       setCurrentStep('reset-method')
       setErrors({})
     }
-  }
-
-  const switchAuthFlow = () => {
-    if (authFlow === 'signin') {
-      setAuthFlow('signup')
-      setCurrentStep('email')
-    } else {
-      setAuthFlow('signin')
-      setCurrentStep('email')
-    }
-    setErrors({})
-    setEmail("")
-    setPassword("")
-    setConfirmPassword("")
-    setFullName("")
-    setPhoneNumber("")
-    setSmsCode("")
-    setAcceptedTerms(false)
   }
 
   // Welcome Animation Component
@@ -370,13 +384,13 @@ export function AuthCard() {
 
   return (
     <motion.div
-      initial={{ scale: 0.8, opacity: 0, y: 30 }}
-      animate={{ scale: 1, opacity: 1, y: 0 }}
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
       transition={{ 
-        duration: 0.4, 
-        ease: [0.23, 1, 0.32, 1],
+        duration: 0.35, 
+        ease: [0.22, 1, 0.36, 1],
         type: "spring",
-        stiffness: 300,
+        stiffness: 400,
         damping: 30
       }}
       className="min-h-screen flex items-center justify-center p-4 relative"
@@ -399,7 +413,7 @@ export function AuthCard() {
       )}
 
       {/* Auth Flow Switch Button - Top Right */}
-      {currentStep === 'email' && (
+      {false && ( // Hidden since we're using detection-based flow
         <motion.div
           initial={{ x: 20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -427,12 +441,12 @@ export function AuthCard() {
             {currentStep === 'email' && (
               <motion.div
                 key="email-step"
-                initial={{ scale: 0.95, opacity: 0, y: 10 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.95, opacity: 0, y: -10 }}
+                initial={{ scale: 0.96, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.96, opacity: 0 }}
                 transition={{ 
-                  duration: 0.3, 
-                  ease: [0.23, 1, 0.32, 1]
+                  duration: 0.25, 
+                  ease: [0.25, 0.46, 0.45, 0.94]
                 }}
               >
                 {/* Header */}
@@ -451,10 +465,10 @@ export function AuthCard() {
                     />
                   </div>
                   <h2 className="text-2xl font-bold text-card-foreground mb-2">
-                    {authFlow === 'signin' ? 'Seller Services' : 'Create Account'}
+                    Seller Services
                   </h2>
                   <p className="text-muted-foreground text-sm">
-                    {authFlow === 'signin' ? 'Sign in to your account' : 'Join Seller Services today'}
+                    Enter your email to continue
                   </p>
                 </div>
 
@@ -468,7 +482,7 @@ export function AuthCard() {
                     <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.211.375-.445.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
                     </svg>
-                    {authFlow === 'signin' ? 'Continue with Discord' : 'Sign up with Discord'}
+                    Continue with Discord
                   </Button>
                   
                   <Button
@@ -483,7 +497,7 @@ export function AuthCard() {
                       <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                     </svg>
                     <span className="text-slate-900">
-                      {authFlow === 'signin' ? 'Continue with Google' : 'Sign up with Google'}
+                      Continue with Google
                     </span>
                   </Button>
                 </div>
@@ -521,8 +535,8 @@ export function AuthCard() {
                     className="w-full h-12 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-all duration-200 shadow-lg flex items-center justify-center gap-2"
                     disabled={isLoading}
                   >
-                    Continue
-                    <ArrowRight size={18} />
+                    {isLoading ? "Processing..." : "Continue"}
+                    {!isLoading && <ArrowRight size={18} />}
                   </Button>
                 </div>
 
@@ -538,6 +552,16 @@ export function AuthCard() {
                       Privacy Policy
                     </a>
                   </p>
+                  
+                  {/* Test Credentials - For demo purposes */}
+                  <div className="mt-4 p-3 bg-muted/50 rounded-lg border">
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Test Credentials:</p>
+                    <p className="text-xs text-muted-foreground">
+                      Existing: account@example.com, account@gmail.com<br />
+                      New: new@example.com<br />
+                      Discord Auth: discord@example.com
+                    </p>
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -545,12 +569,12 @@ export function AuthCard() {
             {currentStep === 'password' && (
               <motion.div
                 key="password-step"
-                initial={{ scale: 0.95, opacity: 0, y: 10 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.95, opacity: 0, y: -10 }}
+                initial={{ scale: 0.96, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.96, opacity: 0 }}
                 transition={{ 
-                  duration: 0.3, 
-                  ease: [0.23, 1, 0.32, 1]
+                  duration: 0.25, 
+                  ease: [0.25, 0.46, 0.45, 0.94]
                 }}
               >
                 {/* Header */}
@@ -625,12 +649,12 @@ export function AuthCard() {
             {currentStep === 'signup-form' && (
               <motion.div
                 key="signup-step"
-                initial={{ scale: 0.95, opacity: 0, y: 10 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.95, opacity: 0, y: -10 }}
+                initial={{ scale: 0.96, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.96, opacity: 0 }}
                 transition={{ 
-                  duration: 0.3, 
-                  ease: [0.23, 1, 0.32, 1]
+                  duration: 0.25, 
+                  ease: [0.25, 0.46, 0.45, 0.94]
                 }}
               >
                 {/* Header */}
@@ -770,12 +794,12 @@ export function AuthCard() {
             {currentStep === 'sms-verification' && (
               <motion.div
                 key="sms-step"
-                initial={{ scale: 0.95, opacity: 0, y: 10 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.95, opacity: 0, y: -10 }}
+                initial={{ scale: 0.96, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.96, opacity: 0 }}
                 transition={{ 
-                  duration: 0.3, 
-                  ease: [0.23, 1, 0.32, 1]
+                  duration: 0.25, 
+                  ease: [0.25, 0.46, 0.45, 0.94]
                 }}
               >
                 {/* Header */}
@@ -842,12 +866,12 @@ export function AuthCard() {
             {currentStep === 'reset-method' && (
               <motion.div
                 key="reset-method-step"
-                initial={{ scale: 0.95, opacity: 0, y: 10 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.95, opacity: 0, y: -10 }}
+                initial={{ scale: 0.96, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.96, opacity: 0 }}
                 transition={{ 
-                  duration: 0.3, 
-                  ease: [0.23, 1, 0.32, 1]
+                  duration: 0.25, 
+                  ease: [0.25, 0.46, 0.45, 0.94]
                 }}
               >
                 {/* Header */}
@@ -897,12 +921,12 @@ export function AuthCard() {
             {currentStep === 'reset-password' && (
               <motion.div
                 key="reset-password-step"
-                initial={{ scale: 0.95, opacity: 0, y: 10 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.95, opacity: 0, y: -10 }}
+                initial={{ scale: 0.96, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.96, opacity: 0 }}
                 transition={{ 
-                  duration: 0.3, 
-                  ease: [0.23, 1, 0.32, 1]
+                  duration: 0.25, 
+                  ease: [0.25, 0.46, 0.45, 0.94]
                 }}
               >
                 {/* Header */}
