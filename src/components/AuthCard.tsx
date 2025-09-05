@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
-import ssLogo from "@/assets/images/ss-logo.svg"
+import ssLogo from "@/assets/images/Seller_Services_Logo.png"
 import discordIcon from "@/assets/images/discord-icon.svg"
 import googleIcon from "@/assets/images/google-icon.svg"
 
@@ -79,7 +79,7 @@ export function AuthCard() {
       <Card className="w-full max-w-md shadow-lg border-0 bg-card/80 backdrop-blur-sm">
         <CardHeader className="text-center space-y-4 pb-6">
           <div className="flex justify-center">
-            <img src={ssLogo} alt="SS Logo" className="w-16 h-16" />
+            <img src={ssLogo} alt="Seller Services Logo" className="w-16 h-16" />
           </div>
           <div className="space-y-2">
             <CardTitle className="text-2xl font-medium text-foreground">

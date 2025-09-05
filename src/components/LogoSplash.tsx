@@ -1,5 +1,5 @@
 import { motion } from "framer-motion"
-import ssLogo from "@/assets/images/ss-logo.svg"
+import ssLogo from "@/assets/images/Seller_Services_Logo.png"
 
 interface LogoSplashProps {
   onComplete: () => void
@@ -38,7 +38,7 @@ export function LogoSplash({ onComplete }: LogoSplashProps) {
         />
         <img 
           src={ssLogo} 
-          alt="SS Logo" 
+          alt="Seller Services Logo" 
           className="w-32 h-32 relative z-10"
         />
       </motion.div>
