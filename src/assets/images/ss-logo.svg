@@ -1,0 +1,22 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="letterGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8f9fa"/>
+      <stop offset="100%" style="stop-color:#e9ecef"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Left S -->
+  <path d="M8 32 C8 20, 20 8, 32 8 L40 8 C52 8, 64 20, 64 32 C64 44, 52 56, 40 56 L32 56 C26 56, 24 58, 24 64 C24 70, 26 72, 32 72 L56 72 C58 72, 60 74, 60 76 C60 78, 58 80, 56 80 L32 80 C20 80, 8 68, 8 56 C8 44, 20 32, 32 32 L40 32 C46 32, 48 30, 48 24 C48 18, 46 16, 40 16 L16 16 C14 16, 12 14, 12 12 C12 10, 14 8, 16 8 L32 8" 
+        fill="url(#letterGradient)" 
+        stroke="#343a40" 
+        stroke-width="3" 
+        stroke-linejoin="round"/>
+  
+  <!-- Right S -->
+  <path d="M72 32 C72 20, 84 8, 96 8 L104 8 C116 8, 128 20, 128 32 C128 44, 116 56, 104 56 L96 56 C90 56, 88 58, 88 64 C88 70, 90 72, 96 72 L120 72 C122 72, 124 74, 124 76 C124 78, 122 80, 120 80 L96 80 C84 80, 72 68, 72 56 C72 44, 84 32, 96 32 L104 32 C110 32, 112 30, 112 24 C112 18, 110 16, 104 16 L80 16 C78 16, 76 14, 76 12 C76 10, 78 8, 80 8 L96 8"
+        fill="url(#letterGradient)" 
+        stroke="#343a40" 
+        stroke-width="3" 
+        stroke-linejoin="round"/>
+</svg>
