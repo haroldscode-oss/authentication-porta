@@ -33,6 +33,10 @@
   --google-border: oklch(0.85 0 0);
   --button-blue: oklch(0.6 0.15 240);
   --button-blue-hover: oklch(0.55 0.18 240);
+  
+  --focus-ring-color: #000;
+  --focus-ring-width: 2px;
+  --selection-blue: #1a73e8;
 }
 
 @theme {
@@ -66,4 +70,37 @@
   --radius-md: var(--radius);
   --radius-lg: calc(var(--radius) * 1.5);
   --radius-xl: calc(var(--radius) * 2);
+}
+
+/* Inputs: black focus ring */
+input[type="email"],
+input[type="text"],
+input[type="password"],
+textarea,
+select {
+  outline: none;
+}
+
+input[type="email"]:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--focus-ring-color) !important;
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color) !important;
+}
+
+/* Text selection: blue everywhere (incl. inputs) */
+::selection,
+input::selection,
+textarea::selection {
+  background: var(--selection-blue);
+  color: #fff;
+}
+
+::-moz-selection,
+input::-moz-selection,
+textarea::-moz-selection {
+  background: var(--selection-blue);
+  color: #fff;
 }
