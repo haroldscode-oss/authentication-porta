@@ -34,7 +34,7 @@
   --button-blue: oklch(0.6 0.15 240);
   --button-blue-hover: oklch(0.55 0.18 240);
   
-  --focus-ring-color: #000;
+  --focus-ring-color: oklch(0.6 0.15 240);
   --focus-ring-width: 2px;
   --selection-blue: #1a73e8;
 }
