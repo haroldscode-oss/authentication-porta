@@ -34,8 +34,8 @@
   --button-blue: oklch(0.6 0.15 240);
   --button-blue-hover: oklch(0.55 0.18 240);
   
-  --focus-ring-color: oklch(0.75 0 0);
-  --focus-ring-width: 3px;
+  --focus-ring-color: oklch(0.85 0 0);
+  --focus-ring-width: 2px;
   --selection-blue: #1a73e8;
 }
 
@@ -72,13 +72,14 @@
   --radius-xl: calc(var(--radius) * 2);
 }
 
-/* Inputs: black focus ring */
+/* Inputs: soft glow focus ring */
 input[type="email"],
 input[type="text"],
 input[type="password"],
 textarea,
 select {
   outline: none;
+  transition: all 0.2s ease-out;
 }
 
 input[type="email"]:focus,
@@ -87,9 +88,12 @@ input[type="password"]:focus,
 textarea:focus,
 select:focus {
   border-color: var(--focus-ring-color) !important;
-  box-shadow: 0 0 0 var(--focus-ring-width) rgba(128, 128, 128, 0.15), 
-              0 0 8px rgba(128, 128, 128, 0.1),
-              0 0 16px rgba(128, 128, 128, 0.05) !important;
+  box-shadow: 
+    0 0 0 var(--focus-ring-width) rgba(200, 200, 200, 0.3),
+    0 0 8px rgba(180, 180, 180, 0.15),
+    0 0 16px rgba(160, 160, 160, 0.08),
+    0 0 24px rgba(140, 140, 140, 0.04) !important;
+  transition: all 0.2s ease-out;
 }
 
 /* Text selection: blue everywhere (incl. inputs) */

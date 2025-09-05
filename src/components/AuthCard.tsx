@@ -142,7 +142,7 @@ export function AuthCard() {
               placeholder="email@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="h-12 bg-white border border-slate-200 rounded-xl shadow-sm focus:ring-black focus:border-black"
+              className="h-12 bg-white border border-slate-200 rounded-xl shadow-sm"
               disabled={isLoading}
             />
             
