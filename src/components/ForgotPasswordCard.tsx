@@ -158,7 +158,7 @@ export function ForgotPasswordCard({ initialEmail = "", onBack }: ForgotPassword
             className="w-full h-12 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-all duration-200 shadow-lg"
             disabled={isLoading || !email.trim()}
           >
-            {isLoading ? "Sending..." : "Send reset instructions"}
+            {isLoading ? "Sending..." : "Send reset code via Email"}
           </Button>
         </form>
 
