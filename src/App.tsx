@@ -33,7 +33,7 @@ function App() {
   }
 
   return (
-    <div style={{ fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }} className="bg-background text-foreground">>
+    <div style={{ fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }} className="bg-background text-foreground">
       <AnimatePresence mode="wait">
         {showSplash ? (
           <LogoSplash key="splash" onComplete={handleSplashComplete} />
