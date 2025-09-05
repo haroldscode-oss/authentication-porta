@@ -6,15 +6,20 @@ import { toast } from "sonner"
 import { ArrowRight, ArrowLeft, Eye, EyeSlash } from "@phosphor-icons/react"
 import ssLogo from "@/assets/images/Seller_Services_Logo.png"
 
-type AuthStep = 'email' | 'password' | 'dashboard'
+type AuthFlow = 'signin' | 'signup'
+type AuthStep = 'email' | 'password' | 'signup-form' | 'dashboard'
 
 export function AuthCard() {
+  const [authFlow, setAuthFlow] = useState<AuthFlow>('signin')
   const [currentStep, setCurrentStep] = useState<AuthStep>('email')
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [fullName, setFullName] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [errors, setErrors] = useState<{email?: string; password?: string}>({})
+  const [errors, setErrors] = useState<{email?: string; password?: string; confirmPassword?: string; fullName?: string}>({})
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -35,8 +40,65 @@ export function AuthCard() {
     }
     
     // Simulate checking if account exists
-    setCurrentStep('password')
-    toast.success("Account found! Please enter your password.")
+    const accountExists = Math.random() > 0.5 // Random for demo
+    
+    if (accountExists && authFlow === 'signin') {
+      setCurrentStep('password')
+      toast.success("Account found! Please enter your password.")
+    } else if (!accountExists && authFlow === 'signin') {
+      // Switch to signup flow if account doesn't exist
+      setAuthFlow('signup')
+      setCurrentStep('signup-form')
+      toast.message("No account found. Let's create one for you!")
+    } else if (authFlow === 'signup') {
+      // If email exists during signup, redirect to signin
+      if (accountExists) {
+        setAuthFlow('signin')
+        setCurrentStep('password')
+        toast.message("Account already exists. Please sign in.")
+      } else {
+        setCurrentStep('signup-form')
+        toast.success("Great! Let's set up your account.")
+      }
+    }
+  }
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setErrors({})
+    
+    if (!fullName) {
+      setErrors({ fullName: "Full name is required" })
+      return
+    }
+    
+    if (!password) {
+      setErrors({ password: "Password is required" })
+      return
+    }
+    
+    if (password.length < 6) {
+      setErrors({ password: "Password must be at least 6 characters" })
+      return
+    }
+    
+    if (password !== confirmPassword) {
+      setErrors({ confirmPassword: "Passwords do not match" })
+      return
+    }
+    
+    setIsLoading(true)
+    
+    // Simulate account creation
+    try {
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      toast.success("Account created successfully!")
+      setCurrentStep('dashboard')
+    } catch (error) {
+      toast.error("Failed to create account")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handlePasswordLogin = async (e: React.FormEvent) => {
@@ -77,7 +139,25 @@ export function AuthCard() {
     if (currentStep === 'password') {
       setCurrentStep('email')
       setErrors({})
+    } else if (currentStep === 'signup-form') {
+      setCurrentStep('email')
+      setErrors({})
     }
+  }
+
+  const switchAuthFlow = () => {
+    if (authFlow === 'signin') {
+      setAuthFlow('signup')
+      setCurrentStep('email')
+    } else {
+      setAuthFlow('signin')
+      setCurrentStep('email')
+    }
+    setErrors({})
+    setEmail("")
+    setPassword("")
+    setConfirmPassword("")
+    setFullName("")
   }
 
   if (currentStep === 'dashboard') {
@@ -98,13 +178,19 @@ export function AuthCard() {
 
   return (
     <motion.div
-      initial={{ scale: 0.9, opacity: 0 }}
+      initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+      transition={{ 
+        duration: 0.6, 
+        ease: "easeOut",
+        type: "spring",
+        stiffness: 80,
+        damping: 20
+      }}
       className="min-h-screen flex items-center justify-center p-4 relative"
     >
       {/* Navigation Button - Top Left */}
-      {currentStep === 'password' && (
+      {(currentStep === 'password' || currentStep === 'signup-form') && (
         <motion.div
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -120,6 +206,24 @@ export function AuthCard() {
         </motion.div>
       )}
 
+      {/* Auth Flow Switch Button - Top Right */}
+      {currentStep === 'email' && (
+        <motion.div
+          initial={{ x: 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+          className="absolute top-6 right-6 z-10"
+        >
+          <Button
+            onClick={switchAuthFlow}
+            variant="outline"
+            className="h-10 px-4 bg-white/80 backdrop-blur-sm border-slate-200 text-slate-700 rounded-xl shadow-sm hover:bg-white transition-all duration-200"
+          >
+            {authFlow === 'signin' ? 'Sign up' : 'Sign in'}
+          </Button>
+        </motion.div>
+      )}
+
       <div className="w-full max-w-md mx-auto">
         <div className="rounded-2xl p-8 transition-all duration-300" style={{
           background: 'rgb(250, 250, 250)',
@@ -131,10 +235,15 @@ export function AuthCard() {
             {currentStep === 'email' && (
               <motion.div
                 key="email-step"
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: -20 }}
+                transition={{ 
+                  duration: 0.5, 
+                  ease: "easeOut",
+                  type: "spring",
+                  stiffness: 100
+                }}
               >
                 {/* Header */}
                 <div className="text-center mb-8">
@@ -152,10 +261,10 @@ export function AuthCard() {
                     />
                   </div>
                   <h2 className="text-2xl font-bold text-card-foreground mb-2">
-                    Seller Services
+                    {authFlow === 'signin' ? 'Seller Services' : 'Create Account'}
                   </h2>
                   <p className="text-muted-foreground text-sm">
-                    Sign in to your account
+                    {authFlow === 'signin' ? 'Sign in to your account' : 'Join Seller Services today'}
                   </p>
                 </div>
 
@@ -169,7 +278,7 @@ export function AuthCard() {
                     <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.211.375-.445.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
                     </svg>
-                    Continue with Discord
+                    {authFlow === 'signin' ? 'Continue with Discord' : 'Sign up with Discord'}
                   </Button>
                   
                   <Button
@@ -183,7 +292,9 @@ export function AuthCard() {
                       <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                       <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                     </svg>
-                    <span className="text-slate-900">Continue with Google</span>
+                    <span className="text-slate-900">
+                      {authFlow === 'signin' ? 'Continue with Google' : 'Sign up with Google'}
+                    </span>
                   </Button>
                 </div>
 
@@ -244,10 +355,15 @@ export function AuthCard() {
             {currentStep === 'password' && (
               <motion.div
                 key="password-step"
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: -20 }}
+                transition={{ 
+                  duration: 0.5, 
+                  ease: "easeOut",
+                  type: "spring",
+                  stiffness: 100
+                }}
               >
                 {/* Header */}
                 <div className="text-center mb-8">
@@ -310,6 +426,128 @@ export function AuthCard() {
                   <a href="#" className="text-sm text-blue-600 hover:text-blue-700 transition-colors">
                     Forgot password?
                   </a>
+                </div>
+              </motion.div>
+            )}
+
+            {currentStep === 'signup-form' && (
+              <motion.div
+                key="signup-step"
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: -20 }}
+                transition={{ 
+                  duration: 0.5, 
+                  ease: "easeOut",
+                  type: "spring",
+                  stiffness: 100
+                }}
+              >
+                {/* Header */}
+                <div className="text-center mb-8">
+                  <div className="inline-block mb-4" style={{
+                    filter: 'drop-shadow(rgba(0, 0, 0, 0.3) 2px 2px 4px) drop-shadow(rgba(255, 255, 255, 0.3) 0px 0px 8px)',
+                    textShadow: 'rgba(0, 0, 0, 0.3) 2px 2px 4px, rgba(255, 255, 255, 0.3) -1px -1px 2px'
+                  }}>
+                    <img 
+                      src={ssLogo} 
+                      alt="SS Logo" 
+                      className="w-16 h-16 mx-auto object-contain" 
+                      style={{
+                        filter: 'drop-shadow(rgba(0, 0, 0, 0.04) 0px 10px 8px) drop-shadow(rgba(0, 0, 0, 0.1) 0px 4px 3px)'
+                      }}
+                    />
+                  </div>
+                  <h2 className="text-2xl font-bold text-card-foreground mb-2">
+                    Almost there!
+                  </h2>
+                  <p className="text-muted-foreground text-sm">
+                    {email}
+                  </p>
+                </div>
+
+                {/* Signup Form */}
+                <form onSubmit={handleSignup} className="space-y-4">
+                  <div>
+                    <Input
+                      id="fullName"
+                      type="text"
+                      placeholder="Full name"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="h-12 bg-white border border-slate-200 rounded-xl shadow-sm"
+                      disabled={isLoading}
+                    />
+                    {errors.fullName && (
+                      <p className="text-sm text-red-600 mt-1">{errors.fullName}</p>
+                    )}
+                  </div>
+
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Create password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="h-12 bg-white border border-slate-200 rounded-xl shadow-sm pr-12"
+                      disabled={isLoading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showPassword ? <EyeSlash size={18} /> : <Eye size={18} />}
+                    </button>
+                    {errors.password && (
+                      <p className="text-sm text-red-600 mt-1">{errors.password}</p>
+                    )}
+                  </div>
+
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="Confirm password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="h-12 bg-white border border-slate-200 rounded-xl shadow-sm pr-12"
+                      disabled={isLoading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showConfirmPassword ? <EyeSlash size={18} /> : <Eye size={18} />}
+                    </button>
+                    {errors.confirmPassword && (
+                      <p className="text-sm text-red-600 mt-1">{errors.confirmPassword}</p>
+                    )}
+                  </div>
+                  
+                  <Button
+                    type="submit"
+                    className="w-full h-12 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-all duration-200 shadow-lg"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Creating account..." : "Create account"}
+                  </Button>
+                </form>
+
+                {/* Terms */}
+                <div className="mt-4 text-center">
+                  <p className="text-xs text-muted-foreground">
+                    By creating an account, you agree to our{" "}
+                    <a href="#" className="underline hover:text-foreground transition-colors">
+                      Terms of Service
+                    </a>{" "}
+                    and{" "}
+                    <a href="#" className="underline hover:text-foreground transition-colors">
+                      Privacy Policy
+                    </a>
+                  </p>
                 </div>
               </motion.div>
             )}
