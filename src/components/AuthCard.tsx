@@ -55,7 +55,6 @@ export function AuthCard() {
   }
 
   const handleOAuthLogin = (provider: 'discord' | 'google') => {
-    toast.info(`Redirecting to ${provider}...`)
     // OAuth redirect would happen here
     window.location.href = `/auth/${provider}`
   }
