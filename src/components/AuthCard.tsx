@@ -48,15 +48,17 @@ export function AuthCard() {
 
   // Predefined test credentials
   const testAccounts = {
-    existing: ['account@example.com', 'account@gmail.com'],
+    existing: ['exist@example.com'],
     new: ['new@example.com'],
-    discord: ['discord@example.com']
+    discordOAuth: ['exist@discord.com'],
+    googleOAuth: ['exist@gmail.com']
   }
 
   const checkAccountStatus = (email: string) => {
     if (testAccounts.existing.includes(email)) return 'existing'
     if (testAccounts.new.includes(email)) return 'new'
-    if (testAccounts.discord.includes(email)) return 'discord'
+    if (testAccounts.discordOAuth.includes(email)) return 'discord-oauth'
+    if (testAccounts.googleOAuth.includes(email)) return 'google-oauth'
     return 'unknown'
   }
 
@@ -115,11 +117,18 @@ export function AuthCard() {
         setAuthFlow('signup')
         setCurrentStep('signup-form')
         toast.message("Let's create your account!")
-      } else if (accountStatus === 'discord') {
+      } else if (accountStatus === 'discord-oauth') {
         // Discord OAuth user - redirect to Discord auth
-        toast.message("We found a Discord account! Redirecting...")
+        toast.message("We found a Discord account! Redirecting to Discord authentication...")
         setTimeout(() => {
           handleOAuthLogin('discord')
+        }, 1000)
+        return // Don't reset loading here as OAuth will handle it
+      } else if (accountStatus === 'google-oauth') {
+        // Google OAuth user - redirect to Google auth
+        toast.message("We found a Google account! Redirecting to Google authentication...")
+        setTimeout(() => {
+          handleOAuthLogin('google')
         }, 1000)
         return // Don't reset loading here as OAuth will handle it
       } else {
@@ -346,27 +355,27 @@ export function AuthCard() {
   if (currentStep === 'welcome') {
     return (
       <motion.div
-        initial={{ scale: 0.94, opacity: 0 }}
+        initial={{ scale: 0.96, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ 
-          duration: 0.6, 
-          ease: [0.25, 0.46, 0.45, 0.94]
+          duration: 0.8, 
+          ease: [0.23, 1, 0.32, 1]
         }}
         className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100"
       >
         <motion.div
-          initial={{ y: 20, opacity: 0 }}
+          initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+          transition={{ delay: 0.3, duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
           className="text-center"
         >
           <motion.div
-            initial={{ scale: 0.8, rotate: -90 }}
+            initial={{ scale: 0.8, rotate: -45 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ 
-              delay: 0.1, 
-              duration: 0.7, 
-              ease: [0.25, 0.46, 0.45, 0.94]
+              delay: 0.15, 
+              duration: 0.9, 
+              ease: [0.23, 1, 0.32, 1]
             }}
             className="mb-8"
           >
@@ -381,18 +390,18 @@ export function AuthCard() {
           </motion.div>
           
           <motion.h1
-            initial={{ y: 15, opacity: 0 }}
+            initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+            transition={{ delay: 0.5, duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
             className="text-4xl font-bold text-gray-800 mb-4"
           >
             Welcome to Seller Services!
           </motion.h1>
           
           <motion.p
-            initial={{ y: 15, opacity: 0 }}
+            initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.6, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+            transition={{ delay: 0.7, duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
             className="text-lg text-gray-600"
           >
             You're all set. Let's get started!
@@ -401,7 +410,7 @@ export function AuthCard() {
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ delay: 0.8, duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+            transition={{ delay: 0.9, duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
             className="mt-8"
           >
             <div className="w-16 h-1 bg-blue-500 mx-auto rounded-full" />
@@ -414,9 +423,9 @@ export function AuthCard() {
   if (currentStep === 'dashboard') {
     return (
       <motion.div
-        initial={{ scale: 0.96, opacity: 0 }}
+        initial={{ scale: 0.98, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+        transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
         className="min-h-screen flex items-center justify-center p-4"
       >
         <div className="text-center">
@@ -429,11 +438,11 @@ export function AuthCard() {
 
   return (
     <motion.div
-      initial={{ scale: 0.96, opacity: 0, y: 8 }}
+      initial={{ scale: 0.98, opacity: 0, y: 4 }}
       animate={{ scale: 1, opacity: 1, y: 0 }}
       transition={{ 
-        duration: 0.65,
-        ease: [0.25, 0.46, 0.45, 0.94],
+        duration: 0.85,
+        ease: [0.23, 1, 0.32, 1],
         type: "tween"
       }}
       className="min-h-screen flex items-center justify-center p-4 relative bg-white"
@@ -487,13 +496,13 @@ export function AuthCard() {
             {currentStep === 'email' && (
               <motion.div
                 key="email-step"
-                initial={{ scale: 0.98, opacity: 0, y: 4 }}
+                initial={{ scale: 0.99, opacity: 0, y: 2 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.98, opacity: 0, y: -4 }}
+                exit={{ scale: 0.99, opacity: 0, y: -2 }}
                 transition={{ 
-                  duration: 0.35, 
-                  ease: [0.25, 0.46, 0.45, 0.94]
-                }}
+                  duration: 0.45, 
+                  ease: [0.23, 1, 0.32, 1]
+                }}}
               >
                 {/* Header */}
                 <div className="text-center mb-8">
@@ -598,16 +607,6 @@ export function AuthCard() {
                       Privacy Policy
                     </a>
                   </p>
-                  
-                  {/* Test Credentials - For demo purposes */}
-                  <div className="mt-4 p-3 bg-muted/50 rounded-lg border">
-                    <p className="text-xs font-medium text-muted-foreground mb-1">Test Credentials:</p>
-                    <p className="text-xs text-muted-foreground">
-                      Existing: account@example.com, account@gmail.com<br />
-                      New: new@example.com<br />
-                      Discord Auth: discord@example.com
-                    </p>
-                  </div>
                 </div>
               </motion.div>
             )}
@@ -615,13 +614,13 @@ export function AuthCard() {
             {currentStep === 'password' && (
               <motion.div
                 key="password-step"
-                initial={{ scale: 0.98, opacity: 0, y: 4 }}
+                initial={{ scale: 0.99, opacity: 0, y: 2 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.98, opacity: 0, y: -4 }}
+                exit={{ scale: 0.99, opacity: 0, y: -2 }}
                 transition={{ 
-                  duration: 0.35, 
-                  ease: [0.25, 0.46, 0.45, 0.94]
-                }}
+                  duration: 0.45, 
+                  ease: [0.23, 1, 0.32, 1]
+                }}}
               >
                 {/* Header */}
                 <div className="text-center mb-8">
@@ -695,13 +694,13 @@ export function AuthCard() {
             {currentStep === 'signup-form' && (
               <motion.div
                 key="signup-step"
-                initial={{ scale: 0.98, opacity: 0, y: 4 }}
+                initial={{ scale: 0.99, opacity: 0, y: 2 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.98, opacity: 0, y: -4 }}
+                exit={{ scale: 0.99, opacity: 0, y: -2 }}
                 transition={{ 
-                  duration: 0.35, 
-                  ease: [0.25, 0.46, 0.45, 0.94]
-                }}
+                  duration: 0.45, 
+                  ease: [0.23, 1, 0.32, 1]
+                }}}
               >
                 {/* Header */}
                 <div className="text-center mb-8">
@@ -840,13 +839,13 @@ export function AuthCard() {
             {currentStep === 'sms-verification' && (
               <motion.div
                 key="sms-step"
-                initial={{ scale: 0.98, opacity: 0, y: 4 }}
+                initial={{ scale: 0.99, opacity: 0, y: 2 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.98, opacity: 0, y: -4 }}
+                exit={{ scale: 0.99, opacity: 0, y: -2 }}
                 transition={{ 
-                  duration: 0.35, 
-                  ease: [0.25, 0.46, 0.45, 0.94]
-                }}
+                  duration: 0.45, 
+                  ease: [0.23, 1, 0.32, 1]
+                }}}
               >
                 {/* Header */}
                 <div className="text-center mb-8">
@@ -922,13 +921,13 @@ export function AuthCard() {
             {currentStep === 'reset-method' && (
               <motion.div
                 key="reset-method-step"
-                initial={{ scale: 0.98, opacity: 0, y: 4 }}
+                initial={{ scale: 0.99, opacity: 0, y: 2 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.98, opacity: 0, y: -4 }}
+                exit={{ scale: 0.99, opacity: 0, y: -2 }}
                 transition={{ 
-                  duration: 0.35, 
-                  ease: [0.25, 0.46, 0.45, 0.94]
-                }}
+                  duration: 0.45, 
+                  ease: [0.23, 1, 0.32, 1]
+                }}}
               >
                 {/* Header */}
                 <div className="text-center mb-8">
@@ -977,13 +976,13 @@ export function AuthCard() {
             {currentStep === 'email-verification' && (
               <motion.div
                 key="email-verification-step"
-                initial={{ scale: 0.98, opacity: 0, y: 4 }}
+                initial={{ scale: 0.99, opacity: 0, y: 2 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.98, opacity: 0, y: -4 }}
+                exit={{ scale: 0.99, opacity: 0, y: -2 }}
                 transition={{ 
-                  duration: 0.35, 
-                  ease: [0.25, 0.46, 0.45, 0.94]
-                }}
+                  duration: 0.45, 
+                  ease: [0.23, 1, 0.32, 1]
+                }}}
               >
                 {/* Header */}
                 <div className="text-center mb-8">
@@ -1065,13 +1064,13 @@ export function AuthCard() {
             {currentStep === 'reset-password' && (
               <motion.div
                 key="reset-password-step"
-                initial={{ scale: 0.98, opacity: 0, y: 4 }}
+                initial={{ scale: 0.99, opacity: 0, y: 2 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.98, opacity: 0, y: -4 }}
+                exit={{ scale: 0.99, opacity: 0, y: -2 }}
                 transition={{ 
-                  duration: 0.35, 
-                  ease: [0.25, 0.46, 0.45, 0.94]
-                }}
+                  duration: 0.45, 
+                  ease: [0.23, 1, 0.32, 1]
+                }}}
               >
                 {/* Header */}
                 <div className="text-center mb-8">
