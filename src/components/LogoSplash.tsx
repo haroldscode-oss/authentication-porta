@@ -12,28 +12,27 @@ export function LogoSplash({ onComplete }: LogoSplashProps) {
       initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.5, delay: 2.5 }}
-      onAnimationComplete={() => setTimeout(onComplete, 500)}
+      transition={{ duration: 0.8, delay: 3.2, ease: "easeInOut" }}
+      onAnimationComplete={() => setTimeout(onComplete, 800)}
     >
       <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
+        initial={{ scale: 0.6, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ 
-          duration: 0.6, 
-          ease: "easeOut",
-          type: "spring",
-          stiffness: 100
+          duration: 1.2, 
+          ease: [0.25, 0.1, 0.25, 1],
+          type: "tween"
         }}
         className="relative"
       >
         <motion.div
           className="absolute inset-0 bg-primary/5 rounded-full blur-xl"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1.5 }}
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1.8, opacity: 1 }}
           transition={{ 
-            duration: 1, 
-            delay: 0.3,
-            ease: "easeOut"
+            duration: 1.8, 
+            delay: 0.6,
+            ease: [0.25, 0.1, 0.25, 1]
           }}
         />
         <img 

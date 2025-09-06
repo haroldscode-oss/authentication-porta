@@ -8,7 +8,7 @@ import { ArrowRight, ArrowLeft, Eye, EyeSlash, Phone, Envelope } from "@phosphor
 import ssLogo from "@/assets/images/Seller_Services_Logo.png"
 
 type AuthFlow = 'signin' | 'signup'
-type AuthStep = 'email' | 'password' | 'signup-form' | 'sms-verification' | 'welcome' | 'dashboard' | 'forgot-password' | 'reset-method' | 'reset-password'
+type AuthStep = 'email' | 'password' | 'signup-form' | 'sms-verification' | 'welcome' | 'dashboard' | 'forgot-password' | 'reset-method' | 'reset-password' | 'email-verification'
 
 export function AuthCard() {
   const [authFlow, setAuthFlow] = useState<AuthFlow>('signin')
@@ -19,6 +19,7 @@ export function AuthCard() {
   const [fullName, setFullName] = useState("")
   const [phoneNumber, setPhoneNumber] = useState("")
   const [smsCode, setSmsCode] = useState("")
+  const [emailCode, setEmailCode] = useState("")
   const [resetMethod, setResetMethod] = useState<'email' | 'phone'>('email')
   const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -31,6 +32,7 @@ export function AuthCard() {
     fullName?: string
     phoneNumber?: string
     smsCode?: string
+    emailCode?: string
     terms?: string
   }>({})
 
@@ -197,11 +199,19 @@ export function AuthCard() {
     
     try {
       await new Promise(resolve => setTimeout(resolve, 1500))
-      toast.success("Phone verified successfully!")
-      setCurrentStep('welcome')
-      setTimeout(() => {
-        setCurrentStep('dashboard')
-      }, 2500)
+      
+      // Check if this is coming from the reset flow or signup flow
+      if (authFlow === 'signup') {
+        toast.success("Phone verified successfully!")
+        setCurrentStep('welcome')
+        setTimeout(() => {
+          setCurrentStep('dashboard')
+        }, 2500)
+      } else {
+        // This is from password reset flow
+        toast.success("SMS code verified successfully!")
+        setCurrentStep('email') // Back to login after successful verification
+      }
     } catch (error) {
       toast.error("Invalid verification code")
       setErrors({ smsCode: "Invalid verification code" })
@@ -255,7 +265,44 @@ export function AuthCard() {
 
   const handleResetMethod = (method: 'email' | 'phone') => {
     setResetMethod(method)
-    setCurrentStep('reset-password')
+    setIsLoading(true)
+    
+    // Simulate sending the reset code
+    setTimeout(() => {
+      setIsLoading(false)
+      if (method === 'email') {
+        // Go directly to email verification 6-digit code page
+        setCurrentStep('email-verification')
+        toast.success("Verification code sent to your email!")
+      } else {
+        // Go directly to SMS verification 6-digit code page  
+        setCurrentStep('sms-verification')
+        toast.success("Verification code sent to your phone!")
+      }
+    }, 800)
+  }
+
+  const handleEmailVerification = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setErrors({})
+    
+    if (!emailCode || emailCode.length !== 6) {
+      setErrors({ emailCode: "Please enter the 6-digit code" })
+      return
+    }
+    
+    setIsLoading(true)
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      toast.success("Email verified successfully!")
+      setCurrentStep('email') // Back to login after successful verification
+    } catch (error) {
+      toast.error("Invalid verification code")
+      setErrors({ emailCode: "Invalid verification code" })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handlePasswordReset = async (e: React.FormEvent) => {
@@ -287,6 +334,9 @@ export function AuthCard() {
       setCurrentStep('password')
       setErrors({})
     } else if (currentStep === 'reset-password') {
+      setCurrentStep('reset-method')
+      setErrors({})
+    } else if (currentStep === 'email-verification') {
       setCurrentStep('reset-method')
       setErrors({})
     }
@@ -387,9 +437,17 @@ export function AuthCard() {
         type: "tween"
       }}
       className="min-h-screen flex items-center justify-center p-4 relative"
+      style={{
+        background: 'linear-gradient(135deg, rgb(255, 255, 255), rgb(248, 250, 252), rgb(226, 232, 240), rgb(30, 41, 59), rgb(15, 23, 42), rgb(0, 0, 0))',
+        backgroundSize: '600% 600%',
+        backgroundPosition: '90% 65%',
+        animation: 'subtle-flow 20s ease-in-out infinite',
+        backdropFilter: 'blur(40px)',
+        fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif'
+      }}
     >
       {/* Navigation Button - Top Left */}
-      {(currentStep === 'password' || currentStep === 'signup-form' || currentStep === 'sms-verification' || currentStep === 'reset-method' || currentStep === 'reset-password') && (
+      {(currentStep === 'password' || currentStep === 'signup-form' || currentStep === 'sms-verification' || currentStep === 'reset-method' || currentStep === 'reset-password' || currentStep === 'email-verification') && (
         <motion.div
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -823,6 +881,16 @@ export function AuthCard() {
                       onChange={(e) => {
                         const value = e.target.value.replace(/\D/g, '').slice(0, 6)
                         setSmsCode(value)
+                        // Auto-submit when 6 digits are entered
+                        if (value.length === 6) {
+                          setTimeout(() => {
+                            const form = e.target.closest('form')
+                            if (form) {
+                              const submitEvent = new Event('submit', { bubbles: true })
+                              form.dispatchEvent(submitEvent)
+                            }
+                          }, 100)
+                        }
                       }}
                       className="h-12 bg-white border border-slate-200 rounded-xl shadow-sm text-center text-lg font-mono tracking-widest"
                       disabled={isLoading}
@@ -906,6 +974,94 @@ export function AuthCard() {
                   >
                     <Phone size={20} />
                     Send reset code via SMS
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
+            {currentStep === 'email-verification' && (
+              <motion.div
+                key="email-verification-step"
+                initial={{ scale: 0.98, opacity: 0, y: 4 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.98, opacity: 0, y: -4 }}
+                transition={{ 
+                  duration: 0.35, 
+                  ease: [0.25, 0.46, 0.45, 0.94]
+                }}
+              >
+                {/* Header */}
+                <div className="text-center mb-8">
+                  <div className="inline-block mb-6" style={{
+                    filter: 'drop-shadow(rgba(0, 0, 0, 0.3) 2px 2px 4px) drop-shadow(rgba(255, 255, 255, 0.3) 0px 0px 8px)',
+                    textShadow: 'rgba(0, 0, 0, 0.3) 2px 2px 4px, rgba(255, 255, 255, 0.3) -1px -1px 2px'
+                  }}>
+                    <Envelope size={48} className="mx-auto text-blue-600" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-card-foreground mb-4">
+                    Check your email
+                  </h2>
+                  <p className="text-muted-foreground text-base leading-relaxed">
+                    Enter the 6-digit code sent to<br />
+                    <span className="font-medium text-foreground">{email}</span>
+                  </p>
+                </div>
+
+                {/* Email Code Form */}
+                <form onSubmit={handleEmailVerification} className="space-y-6">
+                  <div>
+                    <Input
+                      id="emailCode"
+                      type="text"
+                      placeholder="000000"
+                      value={emailCode}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '').slice(0, 6)
+                        setEmailCode(value)
+                        // Auto-submit when 6 digits are entered
+                        if (value.length === 6) {
+                          setTimeout(() => {
+                            const form = e.target.closest('form')
+                            if (form) {
+                              const submitEvent = new Event('submit', { bubbles: true })
+                              form.dispatchEvent(submitEvent)
+                            }
+                          }, 100)
+                        }
+                      }}
+                      className="w-full h-14 text-center text-xl font-mono tracking-[0.5em] bg-white border border-slate-200 rounded-xl shadow-sm"
+                      style={{
+                        outline: 'oklch(0.2 0 0) none 0px',
+                        transition: '0.25s cubic-bezier(0.4, 0, 0.2, 1)'
+                      }}
+                      disabled={isLoading}
+                      maxLength={6}
+                      autoComplete="one-time-code"
+                    />
+                    {errors.emailCode && (
+                      <p className="text-sm text-red-600 mt-1">{errors.emailCode}</p>
+                    )}
+                  </div>
+                  
+                  <Button
+                    type="submit"
+                    className="w-full h-12 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-all duration-200 shadow-lg disabled:opacity-50"
+                    disabled={isLoading || emailCode.length !== 6}
+                  >
+                    {isLoading ? "Verifying..." : "Verify code"}
+                  </Button>
+                </form>
+
+                {/* Resend Code */}
+                <div className="mt-6 text-center">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => toast.success("Verification code resent to your email!")}
+                    className="text-blue-600 hover:text-blue-700 p-0 h-auto font-normal text-sm"
+                    disabled={isLoading}
+                  >
+                    Didn't receive code? <span className="underline">Resend</span>
                   </Button>
                 </div>
               </motion.div>
