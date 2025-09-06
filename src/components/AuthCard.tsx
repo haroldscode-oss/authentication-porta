@@ -502,7 +502,7 @@ export function AuthCard() {
                 transition={{ 
                   duration: 0.45, 
                   ease: [0.23, 1, 0.32, 1]
-                }}}
+                }}
               >
                 {/* Header */}
                 <div className="text-center mb-8">
@@ -620,7 +620,7 @@ export function AuthCard() {
                 transition={{ 
                   duration: 0.45, 
                   ease: [0.23, 1, 0.32, 1]
-                }}}
+                }}
               >
                 {/* Header */}
                 <div className="text-center mb-8">
@@ -700,7 +700,7 @@ export function AuthCard() {
                 transition={{ 
                   duration: 0.45, 
                   ease: [0.23, 1, 0.32, 1]
-                }}}
+                }}
               >
                 {/* Header */}
                 <div className="text-center mb-8">
@@ -845,7 +845,7 @@ export function AuthCard() {
                 transition={{ 
                   duration: 0.45, 
                   ease: [0.23, 1, 0.32, 1]
-                }}}
+                }}
               >
                 {/* Header */}
                 <div className="text-center mb-8">
@@ -927,7 +927,7 @@ export function AuthCard() {
                 transition={{ 
                   duration: 0.45, 
                   ease: [0.23, 1, 0.32, 1]
-                }}}
+                }}
               >
                 {/* Header */}
                 <div className="text-center mb-8">
@@ -982,7 +982,7 @@ export function AuthCard() {
                 transition={{ 
                   duration: 0.45, 
                   ease: [0.23, 1, 0.32, 1]
-                }}}
+                }}
               >
                 {/* Header */}
                 <div className="text-center mb-8">
@@ -1070,7 +1070,7 @@ export function AuthCard() {
                 transition={{ 
                   duration: 0.45, 
                   ease: [0.23, 1, 0.32, 1]
-                }}}
+                }}
               >
                 {/* Header */}
                 <div className="text-center mb-8">
