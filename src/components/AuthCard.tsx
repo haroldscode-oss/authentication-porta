@@ -384,14 +384,15 @@ export function AuthCard() {
 
   return (
     <motion.div
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
+      initial={{ scale: 0.85, opacity: 0, y: 20 }}
+      animate={{ scale: 1, opacity: 1, y: 0 }}
       transition={{ 
-        duration: 0.35, 
-        ease: [0.22, 1, 0.36, 1],
+        duration: 0.8,
+        ease: [0.16, 1, 0.3, 1],
         type: "spring",
-        stiffness: 400,
-        damping: 30
+        stiffness: 280,
+        damping: 25,
+        mass: 0.8
       }}
       className="min-h-screen flex items-center justify-center p-4 relative"
     >
@@ -441,12 +442,12 @@ export function AuthCard() {
             {currentStep === 'email' && (
               <motion.div
                 key="email-step"
-                initial={{ scale: 0.96, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.96, opacity: 0 }}
+                initial={{ scale: 0.92, opacity: 0, y: 8 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.92, opacity: 0, y: -8 }}
                 transition={{ 
-                  duration: 0.25, 
-                  ease: [0.25, 0.46, 0.45, 0.94]
+                  duration: 0.45, 
+                  ease: [0.16, 1, 0.3, 1]
                 }}
               >
                 {/* Header */}
@@ -569,12 +570,12 @@ export function AuthCard() {
             {currentStep === 'password' && (
               <motion.div
                 key="password-step"
-                initial={{ scale: 0.96, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.96, opacity: 0 }}
+                initial={{ scale: 0.92, opacity: 0, y: 8 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.92, opacity: 0, y: -8 }}
                 transition={{ 
-                  duration: 0.25, 
-                  ease: [0.25, 0.46, 0.45, 0.94]
+                  duration: 0.45, 
+                  ease: [0.16, 1, 0.3, 1]
                 }}
               >
                 {/* Header */}
@@ -649,12 +650,12 @@ export function AuthCard() {
             {currentStep === 'signup-form' && (
               <motion.div
                 key="signup-step"
-                initial={{ scale: 0.96, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.96, opacity: 0 }}
+                initial={{ scale: 0.92, opacity: 0, y: 8 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.92, opacity: 0, y: -8 }}
                 transition={{ 
-                  duration: 0.25, 
-                  ease: [0.25, 0.46, 0.45, 0.94]
+                  duration: 0.45, 
+                  ease: [0.16, 1, 0.3, 1]
                 }}
               >
                 {/* Header */}
@@ -794,12 +795,12 @@ export function AuthCard() {
             {currentStep === 'sms-verification' && (
               <motion.div
                 key="sms-step"
-                initial={{ scale: 0.96, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.96, opacity: 0 }}
+                initial={{ scale: 0.92, opacity: 0, y: 8 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.92, opacity: 0, y: -8 }}
                 transition={{ 
-                  duration: 0.25, 
-                  ease: [0.25, 0.46, 0.45, 0.94]
+                  duration: 0.45, 
+                  ease: [0.16, 1, 0.3, 1]
                 }}
               >
                 {/* Header */}
@@ -866,12 +867,12 @@ export function AuthCard() {
             {currentStep === 'reset-method' && (
               <motion.div
                 key="reset-method-step"
-                initial={{ scale: 0.96, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.96, opacity: 0 }}
+                initial={{ scale: 0.92, opacity: 0, y: 8 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.92, opacity: 0, y: -8 }}
                 transition={{ 
-                  duration: 0.25, 
-                  ease: [0.25, 0.46, 0.45, 0.94]
+                  duration: 0.45, 
+                  ease: [0.16, 1, 0.3, 1]
                 }}
               >
                 {/* Header */}
@@ -921,12 +922,12 @@ export function AuthCard() {
             {currentStep === 'reset-password' && (
               <motion.div
                 key="reset-password-step"
-                initial={{ scale: 0.96, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.96, opacity: 0 }}
+                initial={{ scale: 0.92, opacity: 0, y: 8 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.92, opacity: 0, y: -8 }}
                 transition={{ 
-                  duration: 0.25, 
-                  ease: [0.25, 0.46, 0.45, 0.94]
+                  duration: 0.45, 
+                  ease: [0.16, 1, 0.3, 1]
                 }}
               >
                 {/* Header */}
