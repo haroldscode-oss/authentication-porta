@@ -436,13 +436,8 @@ export function AuthCard() {
         ease: [0.25, 0.46, 0.45, 0.94],
         type: "tween"
       }}
-      className="min-h-screen flex items-center justify-center p-4 relative"
+      className="min-h-screen flex items-center justify-center p-4 relative bg-white"
       style={{
-        background: 'linear-gradient(135deg, rgb(255, 255, 255), rgb(248, 250, 252), rgb(226, 232, 240), rgb(30, 41, 59), rgb(15, 23, 42), rgb(0, 0, 0))',
-        backgroundSize: '600% 600%',
-        backgroundPosition: '90% 65%',
-        animation: 'subtle-flow 20s ease-in-out infinite',
-        backdropFilter: 'blur(40px)',
         fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif'
       }}
     >
@@ -483,7 +478,7 @@ export function AuthCard() {
 
       <div className="w-full max-w-md mx-auto">
         <div className="rounded-2xl p-8 transition-all duration-300" style={{
-          background: 'rgb(250, 250, 250)',
+          background: 'rgb(255, 255, 255)',
           border: '1px solid rgb(218, 224, 231)',
           boxShadow: 'rgb(255, 255, 255) 2px 2px 4px 0px inset, rgb(190, 199, 207) -2px -2px 4px 0px inset, rgba(0, 0, 0, 0.12) 0px 8px 32px 0px, rgba(0, 0, 0, 0.08) 0px 4px 16px 0px',
           backdropFilter: 'blur(8px)'
