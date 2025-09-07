@@ -151,12 +151,8 @@ export function AuthCard() {
       return
     }
     
-    if (!phoneNumber.trim()) {
-      setErrors({ phoneNumber: "Phone number is required" })
-      return
-    }
-    
-    if (!validatePhone(phoneNumber)) {
+    // Phone number is now optional - only validate if provided
+    if (phoneNumber.trim() && !validatePhone(phoneNumber)) {
       setErrors({ phoneNumber: "Please enter a valid phone number" })
       return
     }
@@ -186,8 +182,19 @@ export function AuthCard() {
     // Simulate account creation and SMS sending
     try {
       await new Promise(resolve => setTimeout(resolve, 2000))
-      toast.success("Verification code sent to your phone!")
-      setCurrentStep('sms-verification')
+      
+      // If phone number is provided, go to SMS verification
+      if (phoneNumber.trim()) {
+        toast.success("Verification code sent to your phone!")
+        setCurrentStep('sms-verification')
+      } else {
+        // Skip SMS verification if no phone number provided
+        toast.success("Account created successfully!")
+        setCurrentStep('welcome')
+        setTimeout(() => {
+          setCurrentStep('dashboard')
+        }, 2500)
+      }
     } catch (error) {
       toast.error("Failed to create account")
     } finally {
@@ -746,7 +753,7 @@ export function AuthCard() {
                     <Input
                       id="phoneNumber"
                       type="tel"
-                      placeholder="Phone number (e.g., +1234567890)"
+                      placeholder="Phone number (optional)"
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
                       className="h-12 bg-white border border-slate-200 rounded-xl shadow-sm"
@@ -860,7 +867,7 @@ export function AuthCard() {
                   </h2>
                   <p className="text-muted-foreground text-sm">
                     Enter the 6-digit code sent to<br />
-                    <span className="font-medium">{phoneNumber}</span>
+                    <span className="font-medium">{phoneNumber || "your phone"}</span>
                   </p>
                 </div>
 
