@@ -10,9 +10,10 @@ interface PasswordCardProps {
   email: string
   onBack: () => void
   onForgotPassword: () => void
+  onSuccess?: () => void
 }
 
-export function PasswordCard({ email, onBack, onForgotPassword }: PasswordCardProps) {
+export function PasswordCard({ email, onBack, onForgotPassword, onSuccess }: PasswordCardProps) {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -33,7 +34,8 @@ export function PasswordCard({ email, onBack, onForgotPassword }: PasswordCardPr
       
       if (result.success) {
         toast.success("Successfully logged in!")
-        // In a real app, redirect to dashboard would happen here
+        // Redirect to dashboard for existing users
+        onSuccess?.()
       } else {
         toast.error(result.error || "Invalid email or password")
       }

@@ -10,9 +10,12 @@ import ssLogo from "@/assets/images/Seller_Services_Logo.png"
 interface RegisterCardProps {
   email: string
   onBack: () => void
+  onSuccess?: () => void
 }
 
-export function RegisterCard({ email, onBack }: RegisterCardProps) {
+export function RegisterCard({ email, onBack, onSuccess }: RegisterCardProps) {
+  const [name, setName] = useState("")
+  const [phone, setPhone] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [agreedToTerms, setAgreedToTerms] = useState(false)
@@ -23,6 +26,11 @@ export function RegisterCard({ email, onBack }: RegisterCardProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (!name.trim()) {
+      toast.error("Please enter your full name")
+      return
+    }
     
     if (!password.trim()) {
       toast.error("Please enter a password")
@@ -47,11 +55,12 @@ export function RegisterCard({ email, onBack }: RegisterCardProps) {
     setIsLoading(true)
     
     try {
-      const result = await register(email, password, confirmPassword, agreedToTerms)
+      const result = await register(email, password, confirmPassword, agreedToTerms, name, phone)
       
       if (result.success) {
         toast.success("Account created successfully!")
-        // In a real app, redirect to dashboard would happen here
+        // Trigger onboarding for new users
+        onSuccess?.()
       } else {
         toast.error(result.error || "Failed to create account")
       }
@@ -106,15 +115,36 @@ export function RegisterCard({ email, onBack }: RegisterCardProps) {
             />
           </div>
           <h2 className="text-xl font-bold text-card-foreground mb-2">
-            Create your password
+            Create your account
           </h2>
           <p className="text-muted-foreground text-sm break-all">
             {email}
           </p>
         </div>
 
-        {/* Password Form */}
+        {/* Registration Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
+          <Input
+            id="name"
+            type="text"
+            placeholder="Full name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="h-12 bg-white border border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled={isLoading}
+            required
+          />
+
+          <Input
+            id="phone"
+            type="tel"
+            placeholder="Phone number (optional)"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="h-12 bg-white border border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled={isLoading}
+          />
+          
           <div className="relative">
             <Input
               id="password"
@@ -222,7 +252,7 @@ export function RegisterCard({ email, onBack }: RegisterCardProps) {
           <Button
             type="submit"
             className="w-full h-12 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-all duration-200 shadow-lg"
-            disabled={isLoading || !password.trim() || !confirmPassword.trim() || !agreedToTerms || passwordStrength < 3}
+            disabled={isLoading || !name.trim() || !password.trim() || !confirmPassword.trim() || !agreedToTerms || passwordStrength < 3}
           >
             {isLoading ? "Creating account..." : "Create account"}
           </Button>

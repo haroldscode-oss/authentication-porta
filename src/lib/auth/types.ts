@@ -2,6 +2,7 @@ export interface User {
   id: string
   email: string
   name?: string
+  phone?: string
   image?: string
   emailVerified?: Date
   createdAt: Date
@@ -57,6 +58,8 @@ export interface RegisterCredentials {
   password: string
   confirmPassword: string
   agreedToTerms: boolean
+  name?: string
+  phone?: string
 }
 
 export interface AuthResponse {

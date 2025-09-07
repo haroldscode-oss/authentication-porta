@@ -5,7 +5,7 @@ import { AuthService } from './service'
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<AuthResponse>
-  register: (email: string, password: string, confirmPassword: string, agreedToTerms: boolean) => Promise<AuthResponse>
+  register: (email: string, password: string, confirmPassword: string, agreedToTerms: boolean, name?: string, phone?: string) => Promise<AuthResponse>
   logout: () => Promise<void>
   checkEmail: (email: string) => Promise<{ exists: boolean; email: string }>
   requestPasswordReset: (email: string) => Promise<AuthResponse>
@@ -111,7 +111,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     email: string, 
     password: string, 
     confirmPassword: string, 
-    agreedToTerms: boolean
+    agreedToTerms: boolean,
+    name?: string,
+    phone?: string
   ): Promise<AuthResponse> => {
     setIsLoading(true)
     try {
@@ -119,7 +121,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         email,
         password,
         confirmPassword,
-        agreedToTerms
+        agreedToTerms,
+        name,
+        phone
       })
       
       if (response.success && response.user && response.session) {

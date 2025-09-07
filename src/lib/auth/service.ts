@@ -40,7 +40,7 @@ export class AuthService {
   }
 
   // User management
-  async createUser(data: { email: string; name?: string; image?: string }): Promise<User> {
+  async createUser(data: { email: string; name?: string; phone?: string; image?: string }): Promise<User> {
     const userId = crypto.randomUUID()
     const now = new Date()
     
@@ -48,6 +48,7 @@ export class AuthService {
       id: userId,
       email: normalizeEmail(data.email),
       name: data.name,
+      phone: data.phone,
       image: data.image,
       createdAt: now,
       updatedAt: now
@@ -286,7 +287,7 @@ export class AuthService {
   }
 
   async registerWithPassword(credentials: RegisterCredentials): Promise<AuthResponse> {
-    const { email, password, confirmPassword, agreedToTerms } = credentials
+    const { email, password, confirmPassword, agreedToTerms, name, phone } = credentials
     const normalizedEmail = normalizeEmail(email)
     
     // Validation
@@ -314,7 +315,7 @@ export class AuthService {
     }
     
     // Create user
-    const user = await this.createUser({ email: normalizedEmail })
+    const user = await this.createUser({ email: normalizedEmail, name, phone })
     await this.setUserPassword(user.id, password)
     
     // Create session

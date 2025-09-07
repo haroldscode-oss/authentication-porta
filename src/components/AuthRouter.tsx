@@ -7,6 +7,8 @@ import { ResetPasswordCard } from './ResetPasswordCard'
 import { ResetPasswordOptionsCard } from './ResetPasswordOptionsCard'
 import { EmailVerificationCard } from './EmailVerificationCard'
 import { SmsVerificationCard } from './SmsVerificationCard'
+import { OnboardingGuide } from './OnboardingGuide'
+import { MarketplaceDashboard } from './MarketplaceDashboard'
 
 export type AuthStep = 
   | 'login' 
@@ -17,6 +19,8 @@ export type AuthStep =
   | 'reset-password-options'
   | 'email-verification'
   | 'sms-verification'
+  | 'onboarding'
+  | 'dashboard'
 
 interface AuthRouterProps {
   initialStep?: AuthStep
@@ -42,6 +46,7 @@ export function AuthRouter({ initialStep = 'login', resetToken }: AuthRouterProp
           email={email} 
           onBack={() => handleStepChange('login')}
           onForgotPassword={() => handleStepChange('reset-password-options', { email })}
+          onSuccess={() => handleStepChange('dashboard')}
         />
       )
       
@@ -50,6 +55,7 @@ export function AuthRouter({ initialStep = 'login', resetToken }: AuthRouterProp
         <RegisterCard 
           email={email} 
           onBack={() => handleStepChange('login')}
+          onSuccess={() => handleStepChange('onboarding')}
         />
       )
       
@@ -94,8 +100,19 @@ export function AuthRouter({ initialStep = 'login', resetToken }: AuthRouterProp
         <ResetPasswordCard 
           token={resetToken || 'demo-token'}
           onBack={() => handleStepChange('login')}
+          onSuccess={() => handleStepChange('dashboard')}
         />
       )
+
+    case 'onboarding':
+      return (
+        <OnboardingGuide 
+          onComplete={() => handleStepChange('dashboard')}
+        />
+      )
+
+    case 'dashboard':
+      return <MarketplaceDashboard />
       
     default:
       return (

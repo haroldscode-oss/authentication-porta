@@ -9,9 +9,10 @@ import ssLogo from "@/assets/images/Seller_Services_Logo.png"
 interface ResetPasswordCardProps {
   token: string
   onBack: () => void
+  onSuccess?: () => void
 }
 
-export function ResetPasswordCard({ token, onBack }: ResetPasswordCardProps) {
+export function ResetPasswordCard({ token, onBack, onSuccess }: ResetPasswordCardProps) {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -44,7 +45,8 @@ export function ResetPasswordCard({ token, onBack }: ResetPasswordCardProps) {
       
       if (result.success) {
         toast.success("Password reset successfully! You are now logged in.")
-        // In a real app, redirect to dashboard would happen here
+        // Redirect to dashboard after password reset
+        onSuccess?.()
       } else {
         toast.error(result.error || "Failed to reset password")
       }
