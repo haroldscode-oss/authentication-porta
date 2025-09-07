@@ -3,9 +3,12 @@ import { AnimatePresence } from "framer-motion"
 import { Toaster } from "@/components/ui/sonner"
 import { LogoSplash } from "@/components/LogoSplash"
 import { AuthCard } from "@/components/AuthCard"
+import { Marketplace } from "@/components/Marketplace"
+
+type AppState = 'splash' | 'auth' | 'marketplace'
 
 function App() {
-  const [showSplash, setShowSplash] = useState(true)
+  const [appState, setAppState] = useState<AppState>('splash')
   const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
@@ -15,7 +18,7 @@ function App() {
     if (prefersReducedMotion) {
       // Skip animation for users who prefer reduced motion
       setTimeout(() => {
-        setShowSplash(false)
+        setAppState('auth')
         setIsReady(true)
       }, 100)
     } else {
@@ -25,7 +28,11 @@ function App() {
   }, [])
 
   const handleSplashComplete = () => {
-    setShowSplash(false)
+    setAppState('auth')
+  }
+
+  const handleAuthComplete = () => {
+    setAppState('marketplace')
   }
 
   if (!isReady) {
@@ -35,10 +42,14 @@ function App() {
   return (
     <div style={{ fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }} className="bg-background text-foreground">
       <AnimatePresence mode="wait">
-        {showSplash ? (
+        {appState === 'splash' && (
           <LogoSplash key="splash" onComplete={handleSplashComplete} />
-        ) : (
-          <AuthCard key="auth" />
+        )}
+        {appState === 'auth' && (
+          <AuthCard key="auth" onComplete={handleAuthComplete} />
+        )}
+        {appState === 'marketplace' && (
+          <Marketplace key="marketplace" />
         )}
       </AnimatePresence>
       <Toaster position="top-center" richColors />

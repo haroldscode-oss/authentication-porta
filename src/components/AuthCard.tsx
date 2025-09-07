@@ -11,7 +11,7 @@ import ssLogo from "@/assets/images/Seller_Services_Logo.png"
 type AuthFlow = 'signin' | 'signup'
 type AuthStep = 'email' | 'password' | 'signup-form' | 'sms-verification' | 'welcome' | 'onboarding' | 'forgot-password' | 'reset-method' | 'reset-password' | 'email-verification'
 
-export function AuthCard() {
+export function AuthCard({ onComplete }: { onComplete?: () => void }) {
   const [authFlow, setAuthFlow] = useState<AuthFlow>('signin')
   const [currentStep, setCurrentStep] = useState<AuthStep>('email')
   const [email, setEmail] = useState("")
@@ -438,8 +438,9 @@ export function AuthCard() {
   if (currentStep === 'onboarding') {
     return <OnboardingGuide 
       onComplete={() => {
-        // After onboarding is complete, you could navigate to the actual marketplace
         toast.success("Welcome to Seller Services!")
+        // Navigate to marketplace after onboarding
+        onComplete?.()
       }} 
       registrationMethod={registrationMethod}
       userEmail={email}

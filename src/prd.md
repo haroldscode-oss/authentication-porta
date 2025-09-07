@@ -1,65 +1,65 @@
 # Product Requirements Document
-## Seller Services Authentication System
+## Seller Services Marketplace Platform
 
 ### Core Purpose & Success
 
-**Mission Statement**: Create a comprehensive, user-friendly authentication system for Seller Services that handles both email/password and OAuth flows with SMS verification for new accounts.
+**Mission Statement**: Create a comprehensive Upwork-style freelance marketplace that connects buyers and sellers across multiple service categories including Programming & Tech, Graphics & Design, Video Editing, Music & Audio, and Roblox Development.
 
 **Success Indicators**:
-- Seamless user onboarding with minimal friction
-- Secure account creation with phone verification
-- Multiple authentication paths (OAuth + Email/Password)
-- Smooth password recovery process
-- Professional, trustworthy visual design
+- Intuitive service discovery and browsing experience
+- Seamless user onboarding with role-based customization
+- Professional marketplace interface with clear service categorization
+- Effective buyer-seller connection facilitation
+- Trustworthy platform with comprehensive support system
 
-**Experience Qualities**: Trustworthy, Smooth, Professional
+**Experience Qualities**: Professional, Trustworthy, User-Friendly
 
 ### Project Classification & Approach
 
-**Complexity Level**: Light Application (multiple features with state management)
-**Primary User Activity**: Acting (authentication and account management)
+**Complexity Level**: Complex Application (advanced marketplace functionality with multiple user types)
+**Primary User Activity**: Creating, Connecting, and Transacting (marketplace interactions)
 
 ### Essential Features
 
-#### 1. OAuth Authentication (Discord & Google)
-- **Functionality**: One-click sign-in with social providers
-- **Purpose**: Reduce friction for users with existing accounts
-- **Success Criteria**: Immediate redirect and account creation/sign-in
+#### 1. Authentication System
+- **Functionality**: OAuth (Discord & Google) and email/password sign-in with SMS verification
+- **Purpose**: Secure user authentication with multiple convenient options
+- **Success Criteria**: 90%+ authentication completion rate with smooth onboarding
 
-#### 2. Email-Based Authentication
-- **Functionality**: Email/password sign-in with account existence checking
-- **Purpose**: Traditional authentication for users preferring email
-- **Success Criteria**: Smooth flow between email entry and password/signup
+#### 2. Role-Based Onboarding
+- **Functionality**: Buyer vs Seller role selection with customized onboarding
+- **Purpose**: Tailor user experience based on marketplace participation intent
+- **Success Criteria**: Clear role distinction with relevant guidance for each type
 
-#### 3. New User Registration
-- **Functionality**: Full name, phone number, password with TOS acceptance
-- **Purpose**: Collect essential user information and verify identity
-- **Success Criteria**: Complete signup with SMS verification
+#### 3. Service Categories & Discovery
+- **Functionality**: Browse services across 5 main categories with visual icons
+- **Purpose**: Help buyers find relevant services and sellers showcase expertise
+- **Success Criteria**: Intuitive category navigation with clear service organization
 
-#### 4. SMS Verification
-- **Functionality**: 6-digit code verification via phone
-- **Purpose**: Verify phone number ownership and enhance security
-- **Success Criteria**: Successful phone verification within 3 attempts
+#### 4. Marketplace Navigation
+- **Functionality**: Main marketplace view, category browsing, seller/buyer dashboards
+- **Purpose**: Provide comprehensive platform access and service management
+- **Success Criteria**: Under 3 clicks to reach any major platform section
 
-#### 5. Password Recovery
-- **Functionality**: Reset via email or SMS with method selection
-- **Purpose**: Help users regain access to their accounts
-- **Success Criteria**: Successful password reset within 5 minutes
+#### 5. Service Listing Templates
+- **Functionality**: Blank service templates for each category to demonstrate structure
+- **Purpose**: Show platform capabilities and guide future service creation
+- **Success Criteria**: Professional template design that inspires confidence
 
-#### 6. Personalized Onboarding Experience
-- **Functionality**: Customized onboarding content based on registration method (email, Discord, Google)
-- **Purpose**: Provide relevant welcome experience and account-specific guidance
-- **Success Criteria**: Users see personalized content matching their registration method
+#### 6. User Support System
+- **Functionality**: Help center, ticket system, and user assistance features
+- **Purpose**: Provide user support and platform guidance
+- **Success Criteria**: Accessible help resources with clear contact options
 
-#### 7. User Role Selection
-- **Functionality**: Choose between buyer or seller roles during onboarding
-- **Purpose**: Customize experience and onboarding based on user intent
-- **Success Criteria**: Clear role selection with tailored onboarding content
+#### 7. Responsive Design
+- **Functionality**: Mobile-first responsive design across all components
+- **Purpose**: Ensure platform accessibility across all devices
+- **Success Criteria**: Seamless experience on mobile, tablet, and desktop
 
-#### 8. Welcome Animation
-- **Functionality**: Celebratory animation after successful signup/signin
-- **Purpose**: Create positive first impression and sense of accomplishment
-- **Success Criteria**: Smooth transition to marketplace dashboard
+#### 8. Professional UI/UX
+- **Functionality**: Clean white theme with black outlines and smooth animations
+- **Purpose**: Create trustworthy, professional marketplace appearance
+- **Success Criteria**: Consistent visual language that builds user confidence
 
 ### Design Direction
 
