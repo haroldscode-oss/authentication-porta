@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { CaretLeft, CaretRight, ShoppingBag, Storefront, Users, Star } from '@phosphor-icons/react'
+import { CaretLeft, CaretRight, ShoppingBag, Storefront, Users, Star, DiscordLogo, GoogleLogo, At } from '@phosphor-icons/react'
 import { RoleSelectionCard, type UserRole } from './RoleSelectionCard'
+
+export type RegistrationMethod = 'email' | 'discord' | 'google'
 
 interface OnboardingStep {
   id: number
@@ -12,23 +14,120 @@ interface OnboardingStep {
   illustration: React.ReactNode
 }
 
-const onboardingSteps: OnboardingStep[] = [
-  {
+// Get customized welcome step based on registration method
+const getWelcomeStep = (registrationMethod?: RegistrationMethod, userEmail?: string): OnboardingStep => {
+  const getRegistrationIcon = () => {
+    switch (registrationMethod) {
+      case 'discord':
+        return <DiscordLogo size={24} color="#5865F2" />
+      case 'google':
+        return <GoogleLogo size={24} color="#4285F4" />
+      case 'email':
+      default:
+        return <At size={24} color="#2563eb" />
+    }
+  }
+
+  const getWelcomeMessage = () => {
+    switch (registrationMethod) {
+      case 'discord':
+        return `Welcome! We've connected your Discord account ${userEmail ? `(${userEmail})` : ''} to Seller Services. You're now part of our gaming and community marketplace.`
+      case 'google':
+        return `Welcome! We've connected your Google account ${userEmail ? `(${userEmail})` : ''} to Seller Services. Your marketplace journey starts here.`
+      case 'email':
+        return `Welcome! You've successfully created your account ${userEmail ? `with ${userEmail}` : ''}. Ready to explore our marketplace?`
+      default:
+        return "Welcome to Seller Services! Your one-stop marketplace for connecting sellers and buyers. Let's get you started."
+    }
+  }
+
+  return {
     id: 1,
     title: "Welcome to Seller Services",
-    description: "Your one-stop marketplace for connecting sellers and buyers. Start your journey today.",
+    description: getWelcomeMessage(),
     icon: <Storefront size={32} color="#2563eb" />,
     illustration: (
-      <div className="flex items-center justify-center gap-4">
+      <div className="flex items-center justify-center gap-4 mb-4">
         <div className="w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center">
           <Storefront size={40} color="#2563eb" />
         </div>
         <div className="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center">
           <Users size={40} color="#16a34a" />
         </div>
+        {registrationMethod && (
+          <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center border-2 border-gray-200 absolute translate-x-16 translate-y-8">
+            {getRegistrationIcon()}
+          </div>
+        )}
       </div>
     )
-  },
+  }
+}
+// Get customized secondary steps based on registration method
+const getRegistrationSpecificSteps = (registrationMethod?: RegistrationMethod): OnboardingStep[] => {
+  switch (registrationMethod) {
+    case 'discord':
+      return [
+        {
+          id: 5,
+          title: "Discord Integration",
+          description: "Your Discord profile is connected! Use your Discord identity to build trust with other gamers and tech enthusiasts in our community.",
+          icon: <DiscordLogo size={32} color="#5865F2" />,
+          illustration: (
+            <div className="flex items-center justify-center gap-4">
+              <div className="w-20 h-20 bg-purple-100 rounded-2xl flex items-center justify-center">
+                <DiscordLogo size={40} color="#5865F2" />
+              </div>
+              <div className="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center">
+                <Users size={40} color="#16a34a" />
+              </div>
+            </div>
+          )
+        }
+      ]
+    case 'google':
+      return [
+        {
+          id: 6,
+          title: "Google Connected",
+          description: "Your Google account is linked! Enjoy seamless access and sync your preferences across all your devices in our marketplace.",
+          icon: <GoogleLogo size={32} color="#4285F4" />,
+          illustration: (
+            <div className="flex items-center justify-center gap-4">
+              <div className="w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center">
+                <GoogleLogo size={40} color="#4285F4" />
+              </div>
+              <div className="w-20 h-20 bg-orange-100 rounded-2xl flex items-center justify-center">
+                <Star size={40} color="#ea580c" />
+              </div>
+            </div>
+          )
+        }
+      ]
+    case 'email':
+      return [
+        {
+          id: 7,
+          title: "Email Verified",
+          description: "Your email is confirmed! Stay updated with order notifications, seller updates, and exclusive marketplace offers.",
+          icon: <At size={32} color="#2563eb" />,
+          illustration: (
+            <div className="flex items-center justify-center gap-4">
+              <div className="w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center">
+                <At size={40} color="#2563eb" />
+              </div>
+              <div className="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center">
+                <Star size={40} color="#16a34a" />
+              </div>
+            </div>
+          )
+        }
+      ]
+    default:
+      return []
+  }
+}
+const onboardingSteps: OnboardingStep[] = [
   {
     id: 2,
     title: "Browse & Discover",
@@ -79,25 +178,62 @@ const onboardingSteps: OnboardingStep[] = [
   }
 ]
 
-const getBuyerSteps = (): OnboardingStep[] => [
-  onboardingSteps[0], // Welcome
-  onboardingSteps[1], // Browse & Discover
-  onboardingSteps[3]  // Trusted Community
-]
+const getBuyerSteps = (registrationMethod?: RegistrationMethod, userEmail?: string): OnboardingStep[] => {
+  const baseSteps = [
+    getWelcomeStep(registrationMethod, userEmail), // Customized welcome
+    onboardingSteps[0], // Browse & Discover
+    onboardingSteps[2]  // Trusted Community
+  ]
+  
+  // Insert registration-specific step after welcome
+  const specificSteps = getRegistrationSpecificSteps(registrationMethod)
+  if (specificSteps.length > 0) {
+    baseSteps.splice(1, 0, ...specificSteps)
+  }
+  
+  return baseSteps
+}
 
-const getSellerSteps = (): OnboardingStep[] => [
-  onboardingSteps[0], // Welcome
-  onboardingSteps[2], // Start Selling
-  onboardingSteps[3]  // Trusted Community
-]
+const getSellerSteps = (registrationMethod?: RegistrationMethod, userEmail?: string): OnboardingStep[] => {
+  const baseSteps = [
+    getWelcomeStep(registrationMethod, userEmail), // Customized welcome
+    onboardingSteps[1], // Start Selling
+    onboardingSteps[2]  // Trusted Community
+  ]
+  
+  // Insert registration-specific step after welcome
+  const specificSteps = getRegistrationSpecificSteps(registrationMethod)
+  if (specificSteps.length > 0) {
+    baseSteps.splice(1, 0, ...specificSteps)
+  }
+  
+  return baseSteps
+}
 
-const getDefaultSteps = (): OnboardingStep[] => onboardingSteps
+const getDefaultSteps = (registrationMethod?: RegistrationMethod, userEmail?: string): OnboardingStep[] => {
+  const baseSteps = [
+    getWelcomeStep(registrationMethod, userEmail), // Customized welcome
+    ...onboardingSteps // All other steps
+  ]
+  
+  // Insert registration-specific step after welcome
+  const specificSteps = getRegistrationSpecificSteps(registrationMethod)
+  if (specificSteps.length > 0) {
+    baseSteps.splice(1, 0, ...specificSteps)
+  }
+  
+  return baseSteps
+}
+
+export type RegistrationMethod = 'email' | 'discord' | 'google'
 
 interface OnboardingGuideProps {
   onComplete: () => void
+  registrationMethod?: RegistrationMethod
+  userEmail?: string
 }
 
-export function OnboardingGuide({ onComplete }: OnboardingGuideProps) {
+export function OnboardingGuide({ onComplete, registrationMethod, userEmail }: OnboardingGuideProps) {
   const [currentStep, setCurrentStep] = useState(-1) // Start with role selection (-1)
   const [userRole, setUserRole] = useState<UserRole>(null)
 
@@ -110,15 +246,15 @@ export function OnboardingGuide({ onComplete }: OnboardingGuideProps) {
     setCurrentStep(0) // Move to first onboarding step without selecting role
   }
 
-  // Get appropriate steps based on user role
+  // Get appropriate steps based on user role with customized content
   const getStepsForRole = () => {
     switch (userRole) {
       case 'buyer':
-        return getBuyerSteps()
+        return getBuyerSteps(registrationMethod, userEmail)
       case 'seller':
-        return getSellerSteps()
+        return getSellerSteps(registrationMethod, userEmail)
       default:
-        return getDefaultSteps()
+        return getDefaultSteps(registrationMethod, userEmail)
     }
   }
 

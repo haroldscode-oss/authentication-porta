@@ -46,15 +46,20 @@
 - **Purpose**: Help users regain access to their accounts
 - **Success Criteria**: Successful password reset within 5 minutes
 
-#### 6. User Role Selection
+#### 6. Personalized Onboarding Experience
+- **Functionality**: Customized onboarding content based on registration method (email, Discord, Google)
+- **Purpose**: Provide relevant welcome experience and account-specific guidance
+- **Success Criteria**: Users see personalized content matching their registration method
+
+#### 7. User Role Selection
 - **Functionality**: Choose between buyer or seller roles during onboarding
 - **Purpose**: Customize experience and onboarding based on user intent
 - **Success Criteria**: Clear role selection with tailored onboarding content
 
-#### 7. Welcome Animation
+#### 8. Welcome Animation
 - **Functionality**: Celebratory animation after successful signup/signin
 - **Purpose**: Create positive first impression and sense of accomplishment
-- **Success Criteria**: Smooth transition to dashboard
+- **Success Criteria**: Smooth transition to marketplace dashboard
 
 ### Design Direction
 
@@ -125,10 +130,24 @@
 - SMS code expiration and retry limits
 - Secure handling of user credentials
 
+### Personalization & Customization
+
+#### Registration Method Tracking
+- **Implementation**: The system tracks how users register (email, Discord, Google) and customizes their onboarding experience accordingly
+- **Personalized Welcome Messages**: Each registration method gets tailored welcome text that acknowledges their chosen sign-in method
+- **Method-Specific Icons**: Visual indicators show users which service they used to register
+- **Contextual Content**: Additional onboarding steps specific to the registration method (e.g., Discord community features, Google integration benefits)
+
+#### Dynamic Content Flow
+- **Buyer vs Seller Paths**: Role selection determines which onboarding content is shown
+- **Registration-Aware Steps**: Integration benefits and feature highlights are customized based on OAuth provider
+- **Progressive Enhancement**: Core experience works for all users, with enhanced features for specific registration methods
+
 ### Success Metrics
 
 - Authentication completion rate > 90%
 - Average time to complete signup < 3 minutes
 - SMS verification success rate > 95%
-- User satisfaction with onboarding experience
+- User satisfaction with onboarding experience (customized)
 - Minimal support tickets for authentication issues
+- High engagement with registration-method-specific features

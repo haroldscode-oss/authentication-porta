@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "sonner"
 import { ArrowRight, ArrowLeft, Eye, EyeSlash, Phone, Envelope } from "@phosphor-icons/react"
-import { OnboardingGuide } from "@/components/OnboardingGuide"
+import { OnboardingGuide, type RegistrationMethod } from "@/components/OnboardingGuide"
 import ssLogo from "@/assets/images/Seller_Services_Logo.png"
 
 type AuthFlow = 'signin' | 'signup'
@@ -26,6 +26,7 @@ export function AuthCard() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [registrationMethod, setRegistrationMethod] = useState<RegistrationMethod>('email')
   const [errors, setErrors] = useState<{
     email?: string
     password?: string
@@ -65,6 +66,7 @@ export function AuthCard() {
 
   const handleOAuthLogin = (provider: 'discord' | 'google') => {
     setIsLoading(true)
+    setRegistrationMethod(provider) // Track registration method
     
     // Simulate OAuth flow
     setTimeout(() => {
@@ -111,15 +113,18 @@ export function AuthCard() {
       
       if (accountStatus === 'existing') {
         // Account exists - go to password screen
+        setRegistrationMethod('email') // Set email method
         setCurrentStep('password')
         toast.success("Account found! Please enter your password.")
       } else if (accountStatus === 'new') {
         // New user - go to signup form with email prefilled
+        setRegistrationMethod('email') // Set email method
         setAuthFlow('signup')
         setCurrentStep('signup-form')
         toast.message("Let's create your account!")
       } else if (accountStatus === 'discord-oauth') {
         // Discord OAuth user - redirect to Discord auth
+        setRegistrationMethod('discord') // Set Discord method
         toast.message("We found a Discord account! Redirecting to Discord authentication...")
         setTimeout(() => {
           handleOAuthLogin('discord')
@@ -127,6 +132,7 @@ export function AuthCard() {
         return // Don't reset loading here as OAuth will handle it
       } else if (accountStatus === 'google-oauth') {
         // Google OAuth user - redirect to Google auth
+        setRegistrationMethod('google') // Set Google method
         toast.message("We found a Google account! Redirecting to Google authentication...")
         setTimeout(() => {
           handleOAuthLogin('google')
@@ -134,6 +140,7 @@ export function AuthCard() {
         return // Don't reset loading here as OAuth will handle it
       } else {
         // Unknown email - treat as new user for now
+        setRegistrationMethod('email') // Set email method
         setAuthFlow('signup')
         setCurrentStep('signup-form')
         toast.message("Let's create your account!")
@@ -429,10 +436,14 @@ export function AuthCard() {
   }
 
   if (currentStep === 'onboarding') {
-    return <OnboardingGuide onComplete={() => {
-      // After onboarding is complete, you could navigate to the actual marketplace
-      toast.success("Welcome to Seller Services!")
-    }} />
+    return <OnboardingGuide 
+      onComplete={() => {
+        // After onboarding is complete, you could navigate to the actual marketplace
+        toast.success("Welcome to Seller Services!")
+      }} 
+      registrationMethod={registrationMethod}
+      userEmail={email}
+    />
   }
 
   return (

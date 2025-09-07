@@ -7,7 +7,7 @@ import { ResetPasswordCard } from './ResetPasswordCard'
 import { ResetPasswordOptionsCard } from './ResetPasswordOptionsCard'
 import { EmailVerificationCard } from './EmailVerificationCard'
 import { SmsVerificationCard } from './SmsVerificationCard'
-import { OnboardingGuide } from './OnboardingGuide'
+import { OnboardingGuide, type RegistrationMethod } from './OnboardingGuide'
 import { MarketplaceDashboard } from './MarketplaceDashboard'
 
 export type AuthStep = 
@@ -31,10 +31,14 @@ export function AuthRouter({ initialStep = 'login', resetToken }: AuthRouterProp
   const [currentStep, setCurrentStep] = useState<AuthStep>(initialStep)
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('+1 (555) 123-4567') // Demo phone number
+  const [registrationMethod, setRegistrationMethod] = useState<RegistrationMethod>('email')
   
-  const handleStepChange = (step: AuthStep, data?: { email?: string }) => {
+  const handleStepChange = (step: AuthStep, data?: { email?: string; registrationMethod?: RegistrationMethod }) => {
     if (data?.email) {
       setEmail(data.email)
+    }
+    if (data?.registrationMethod) {
+      setRegistrationMethod(data.registrationMethod)
     }
     setCurrentStep(step)
   }
@@ -46,7 +50,7 @@ export function AuthRouter({ initialStep = 'login', resetToken }: AuthRouterProp
           email={email} 
           onBack={() => handleStepChange('login')}
           onForgotPassword={() => handleStepChange('reset-password-options', { email })}
-          onSuccess={() => handleStepChange('onboarding')}
+          onSuccess={() => handleStepChange('onboarding', { registrationMethod: 'email' })}
         />
       )
       
@@ -55,7 +59,7 @@ export function AuthRouter({ initialStep = 'login', resetToken }: AuthRouterProp
         <RegisterCard 
           email={email} 
           onBack={() => handleStepChange('login')}
-          onSuccess={() => handleStepChange('onboarding')}
+          onSuccess={() => handleStepChange('onboarding', { registrationMethod: 'email' })}
         />
       )
       
@@ -100,7 +104,7 @@ export function AuthRouter({ initialStep = 'login', resetToken }: AuthRouterProp
         <ResetPasswordCard 
           token={resetToken || 'demo-token'}
           onBack={() => handleStepChange('login')}
-          onSuccess={() => handleStepChange('onboarding')}
+          onSuccess={() => handleStepChange('onboarding', { registrationMethod: 'email' })}
         />
       )
 
@@ -108,6 +112,8 @@ export function AuthRouter({ initialStep = 'login', resetToken }: AuthRouterProp
       return (
         <OnboardingGuide 
           onComplete={() => handleStepChange('dashboard')}
+          registrationMethod={registrationMethod}
+          userEmail={email}
         />
       )
 
