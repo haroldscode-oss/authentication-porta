@@ -71,3 +71,4 @@ src/lib/auth/utils.ts
 src/lib/demo.ts
 src/prd.md
 src/vite-env.d.ts
+test-oauth.js
