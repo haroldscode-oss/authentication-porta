@@ -225,8 +225,6 @@ const getDefaultSteps = (registrationMethod?: RegistrationMethod, userEmail?: st
   return baseSteps
 }
 
-export type RegistrationMethod = 'email' | 'discord' | 'google'
-
 interface OnboardingGuideProps {
   onComplete: () => void
   registrationMethod?: RegistrationMethod
