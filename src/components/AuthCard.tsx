@@ -5,10 +5,11 @@ import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "sonner"
 import { ArrowRight, ArrowLeft, Eye, EyeSlash, Phone, Envelope } from "@phosphor-icons/react"
+import { OnboardingGuide } from "@/components/OnboardingGuide"
 import ssLogo from "@/assets/images/Seller_Services_Logo.png"
 
 type AuthFlow = 'signin' | 'signup'
-type AuthStep = 'email' | 'password' | 'signup-form' | 'sms-verification' | 'welcome' | 'dashboard' | 'forgot-password' | 'reset-method' | 'reset-password' | 'email-verification'
+type AuthStep = 'email' | 'password' | 'signup-form' | 'sms-verification' | 'welcome' | 'onboarding' | 'forgot-password' | 'reset-method' | 'reset-password' | 'email-verification'
 
 export function AuthCard() {
   const [authFlow, setAuthFlow] = useState<AuthFlow>('signin')
@@ -71,12 +72,12 @@ export function AuthCard() {
       const accountStatus = checkAccountStatus(oauthEmail)
       
       if (accountStatus === 'existing' || provider === 'discord') {
-        // Existing user or Discord auth - show logo animation then dashboard
+        // Existing user or Discord auth - show logo animation then onboarding
         setEmail(oauthEmail)
         setCurrentStep('welcome')
         toast.success(`Signed in with ${provider}!`)
         setTimeout(() => {
-          setCurrentStep('dashboard')
+          setCurrentStep('onboarding')
         }, 2500)
       } else {
         // New user - show create account flow
@@ -192,7 +193,7 @@ export function AuthCard() {
         toast.success("Account created successfully!")
         setCurrentStep('welcome')
         setTimeout(() => {
-          setCurrentStep('dashboard')
+          setCurrentStep('onboarding')
         }, 2500)
       }
     } catch (error) {
@@ -221,7 +222,7 @@ export function AuthCard() {
         toast.success("Phone verified successfully!")
         setCurrentStep('welcome')
         setTimeout(() => {
-          setCurrentStep('dashboard')
+          setCurrentStep('onboarding')
         }, 2500)
       } else {
         // This is from password reset flow
@@ -261,7 +262,7 @@ export function AuthCard() {
         toast.success("Successfully logged in!")
         setCurrentStep('welcome')
         setTimeout(() => {
-          setCurrentStep('dashboard')
+          setCurrentStep('onboarding')
         }, 2500)
       } else {
         // Invalid account for password login
@@ -427,20 +428,11 @@ export function AuthCard() {
     )
   }
 
-  if (currentStep === 'dashboard') {
-    return (
-      <motion.div
-        initial={{ scale: 0.98, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-        className="min-h-screen flex items-center justify-center p-4"
-      >
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-foreground mb-4">Welcome to Dashboard!</h1>
-          <p className="text-muted-foreground">You have successfully logged in.</p>
-        </div>
-      </motion.div>
-    )
+  if (currentStep === 'onboarding') {
+    return <OnboardingGuide onComplete={() => {
+      // After onboarding is complete, you could navigate to the actual marketplace
+      toast.success("Welcome to Seller Services!")
+    }} />
   }
 
   return (

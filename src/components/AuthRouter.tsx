@@ -46,7 +46,7 @@ export function AuthRouter({ initialStep = 'login', resetToken }: AuthRouterProp
           email={email} 
           onBack={() => handleStepChange('login')}
           onForgotPassword={() => handleStepChange('reset-password-options', { email })}
-          onSuccess={() => handleStepChange('dashboard')}
+          onSuccess={() => handleStepChange('onboarding')}
         />
       )
       
@@ -100,7 +100,7 @@ export function AuthRouter({ initialStep = 'login', resetToken }: AuthRouterProp
         <ResetPasswordCard 
           token={resetToken || 'demo-token'}
           onBack={() => handleStepChange('login')}
-          onSuccess={() => handleStepChange('dashboard')}
+          onSuccess={() => handleStepChange('onboarding')}
         />
       )
 
