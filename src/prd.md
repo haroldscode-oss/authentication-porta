@@ -46,7 +46,12 @@
 - **Purpose**: Help users regain access to their accounts
 - **Success Criteria**: Successful password reset within 5 minutes
 
-#### 6. Welcome Animation
+#### 6. User Role Selection
+- **Functionality**: Choose between buyer or seller roles during onboarding
+- **Purpose**: Customize experience and onboarding based on user intent
+- **Success Criteria**: Clear role selection with tailored onboarding content
+
+#### 7. Welcome Animation
 - **Functionality**: Celebratory animation after successful signup/signin
 - **Purpose**: Create positive first impression and sense of accomplishment
 - **Success Criteria**: Smooth transition to dashboard
@@ -95,12 +100,13 @@
 2. **Email Path**: 
    - Enter email → Check existence
    - If exists: Password screen → Sign in → Welcome → Dashboard
-   - If new: Signup form → SMS verification → Welcome → Dashboard
+   - If new: Signup form → SMS verification → Role selection → Onboarding → Dashboard
 3. **OAuth Path**:
    - Provider selection → OAuth redirect
    - If exists: Welcome → Dashboard  
-   - If new: Prefilled signup → SMS verification → Welcome → Dashboard
-4. **Forgot Password**: Method selection → Reset delivery → Return to signin
+   - If new: Prefilled signup → SMS verification → Role selection → Onboarding → Dashboard
+4. **Role Selection**: Choose buyer/seller → Tailored onboarding experience
+5. **Forgot Password**: Method selection → Reset delivery → Return to signin
 
 ### Technical Implementation Notes
 
