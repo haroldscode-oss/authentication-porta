@@ -1,0 +1,15 @@
+{
+  "name": "seller-services-server",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "OAuth backend server for Seller Services",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["oauth", "express", "passport", "authentication"],
+  "author": "Seller Services Team",
+  "license": "MIT"
+}

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "sonner"
 import { ArrowRight, ArrowLeft, Eye, EyeSlash, Phone, Envelope } from "@phosphor-icons/react"
 import { OnboardingGuide, type RegistrationMethod } from "@/components/OnboardingGuide"
+import { oauth } from "@/lib/oauth"
 import ssLogo from "@/assets/images/Seller_Services_Logo.png"
 
 type AuthFlow = 'signin' | 'signup'
@@ -38,6 +39,57 @@ export function AuthCard({ onComplete }: { onComplete?: () => void }) {
     terms?: string
   }>({})
 
+  // Handle OAuth success callback
+  useEffect(() => {
+    const handleOAuthSuccess = (event: CustomEvent) => {
+      const { user, provider } = event.detail
+      console.log('OAuth success:', user)
+      
+      setEmail(user.email)
+      setFullName(user.name)
+      setRegistrationMethod(provider)
+      
+      // Check if this is an existing account (simplified logic)
+      const accountStatus = checkAccountStatus(user.email)
+      
+      if (accountStatus === 'existing' || accountStatus === 'discord-oauth' || accountStatus === 'google-oauth') {
+        // Existing user - show welcome then onboarding
+        setCurrentStep('welcome')
+        toast.success(`Signed in with ${provider}!`)
+        setTimeout(() => {
+          setCurrentStep('onboarding')
+        }, 2500)
+      } else {
+        // New user - show create account flow
+        setAuthFlow('signup')
+        setCurrentStep('signup-form')
+        toast.message(`Welcome! Let's set up your ${provider} account.`)
+      }
+      
+      setIsLoading(false)
+    }
+
+    const handleOAuthError = () => {
+      toast.error('Authentication failed. Please try again.')
+      setIsLoading(false)
+    }
+
+    // Listen for OAuth events
+    window.addEventListener('oauth-success', handleOAuthSuccess as EventListener)
+    window.addEventListener('oauth-error', handleOAuthError)
+
+    // Check if there's already an OAuth user from a previous session
+    const existingUser = oauth.getCurrentUser()
+    if (existingUser && currentStep === 'email') {
+      handleOAuthSuccess({ detail: { user: existingUser, provider: existingUser.provider } } as CustomEvent)
+    }
+
+    return () => {
+      window.removeEventListener('oauth-success', handleOAuthSuccess as EventListener)
+      window.removeEventListener('oauth-error', handleOAuthError)
+    }
+  }, [])
+
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     return emailRegex.test(email)
@@ -68,28 +120,20 @@ export function AuthCard({ onComplete }: { onComplete?: () => void }) {
     setIsLoading(true)
     setRegistrationMethod(provider) // Track registration method
     
-    // Simulate OAuth flow
-    setTimeout(() => {
-      const oauthEmail = `user@${provider}.com` // Simulated OAuth email
-      const accountStatus = checkAccountStatus(oauthEmail)
-      
-      if (accountStatus === 'existing' || provider === 'discord') {
-        // Existing user or Discord auth - show logo animation then onboarding
-        setEmail(oauthEmail)
-        setCurrentStep('welcome')
-        toast.success(`Signed in with ${provider}!`)
-        setTimeout(() => {
-          setCurrentStep('onboarding')
-        }, 2500)
-      } else {
-        // New user - show create account flow
-        setEmail(oauthEmail) // Prefilled from OAuth
-        setAuthFlow('signup')
-        setCurrentStep('signup-form')
-        toast.message(`Welcome! Let's set up your ${provider} account.`)
+    try {
+      if (provider === 'google') {
+        oauth.loginWithGoogle()
+      } else if (provider === 'discord') {
+        oauth.loginWithDiscord()
       }
+      
+      // Note: The OAuth flow will redirect to the backend, then back to the frontend
+      // The OAuth callback will be handled automatically by the oauth utility
+    } catch (error) {
+      console.error('OAuth login error:', error)
+      toast.error(`Failed to authenticate with ${provider}`)
       setIsLoading(false)
-    }, 1500)
+    }
   }
 
   const handleEmailContinue = () => {
