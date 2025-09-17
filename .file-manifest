@@ -3,11 +3,8 @@
 .devcontainer/postStartCommand.sh
 .devcontainer/refreshTools.sh
 .devcontainer/spark.conf
-.env.example
 .file-manifest
-.gitignore
 .spark-initial-sha
-.spark-workbench-id
 BACKEND.md
 OAUTH_NOTES.md
 OAUTH_SETUP.md
@@ -18,9 +15,9 @@ SETUP.md
 SETUP_GUIDE.md
 TAILWIND_INFO.md
 TAILWIND_SETUP.md
+auth-layout.css
+auth-layout.html
 index.html
-package-lock.json
-package.json
 packages/spark-tools/LICENSE
 packages/spark-tools/package.json
 runtime.config.json
