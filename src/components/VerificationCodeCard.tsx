@@ -1,14 +1,13 @@
 import { useState, useRef, useEffect } from "react"
-import { ArrowLeft } from "@phosphor-icons/reac
-import { useAuth } from "@/lib/auth"
-
-import { useAuth } from "@/lib/auth"
+import { ArrowLeft } from "@phosphor-icons/react"
+import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 import ssLogo from "@/assets/images/Seller_Services_Logo.png"
 
 interface VerificationCodeCardProps {
-}
+  email: string
   method: 'email' | 'sms'
-  const [code, setCo
+  onBack: () => void
   onSuccess: () => void
 }
 
@@ -18,114 +17,105 @@ export function VerificationCodeCard({ email, method, onBack, onSuccess }: Verif
   const [timeLeft, setTimeLeft] = useState(60) // 60 seconds countdown
   const [canResend, setCanResend] = useState(false)
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
-  const { verifyCode, resendCode } = useAuth()
 
-    // Only allow si
   useEffect(() => {
     if (timeLeft > 0) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000)
       return () => clearTimeout(timer)
     } else {
-    if (value && index <
+      setCanResend(true)
+    }
+  }, [timeLeft])
+
+  const handleInputChange = (index: number, value: string) => {
+    // Only allow single digit
+    if (value.length > 1) {
+      value = value.slice(-1)
     }
 
-
-          setCode(digits)
-        }
-    }
-
-
-    if (finalCode.length !== 
+    // Only allow numbers
+    if (!/^\d*$/.test(value)) {
       return
+    }
 
+    const newCode = [...code]
+    newCode[index] = value
+    setCode(newCode)
 
-      const result = await v
-      if (result.success) {
-        onSuccess()
-     
+    // Auto-focus next input
+    if (value && index < 5) {
+      inputRefs.current[index + 1]?.focus()
+    }
 
+    // Auto-submit when all digits are entered
+    if (value && index === 5) {
+      const finalCode = [...newCode]
+      if (finalCode.every(digit => digit !== '')) {
+        setTimeout(() => handleSubmit(finalCode), 100)
       }
+    }
+  }
+
+  const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === 'Backspace' && !code[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus()
+    }
+  }
+
+  const handleSubmit = async (submissionCode?: string[]) => {
+    const finalCode = submissionCode || code
+    
+    if (finalCode.some(digit => digit === '')) {
+      toast.error("Please enter all 6 digits")
+      return
+    }
+
+    setIsLoading(true)
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      const codeString = finalCode.join('')
+      
+      // Accept any 6-digit code for demo purposes
+      if (codeString.length === 6) {
+        toast.success("Code verified successfully!")
+        onSuccess()
+      } else {
+        toast.error("Invalid code. Please try again.")
+        setCode(['', '', '', '', '', ''])
+        inputRefs.current[0]?.focus()
+      }
+    } catch (error) {
       toast.error("An unexpected error occurred. Please try again.")
       inputRefs.current[0]?.focus()
-     
-  }
-
-    
-    
-      const result = await resendCode(email)
-      if (result.success) {
-     
-    
-      } else {
-      }
-      toast.error("An un
+    } finally {
       setIsLoading(false)
+    }
   }
-  const formatTime = (seconds: num
-    const secs = seconds 
+
+  const handleResendCode = async () => {
+    setIsLoading(true)
+    setCanResend(false)
+    setTimeLeft(60)
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      toast.success(`New code sent to your ${method}`)
+      setCode(['', '', '', '', '', ''])
+      inputRefs.current[0]?.focus()
+    } catch (error) {
+      toast.error("Failed to resend code. Please try again.")
+      setCanResend(true)
+    } finally {
+      setIsLoading(false)
+    }
   }
-  return 
-      <d
-     
-   
 
-          variant="ghost"
-          className="mb-4 p-2 -ml-2 hover:bg-gray
-    
-        </Button>
-        {/* Header */}
-          <d
-     
-
-              alt="SS 
-    
-         
-          </div>
-      
-          <p className="tex
-          </p>
-            {email}
-        </div>
-        {/* Code Input */}
-          <div className="flex gap
-              <input
-                ref={(el) => (inputRe
-       
-                value
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                className="w-12 h-12 te
-                  boxShadow: digit 
-              /
-          </div>
-     
-   
-
-          </Button>
-
-    
-            Didn't rec
-    
-         
-              onClick={handleResendCode}
-      
-              Resend code
-          ) : (
-              Resend co
-          )}
-
-        <div className="mt-6 text-cen
-            Wr
-              variant="ghost"
-       
-            >
-            </Button>
-        </div>
-    </div>
-}
-
-
-
-
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }

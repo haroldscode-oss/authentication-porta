@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Search, Star, Heart, MessageCircle, User, Menu, X, ChevronRight } from "@phosphor-icons/react"
+import { Search, Star, Heart, ChatCircle, User, List, X, CaretRight } from "@phosphor-icons/react"
+import { Messages } from "@/components/Messages"
 
 // Import assets
 import MainLogo from '@/assets/images/Main_Logo.png'
@@ -23,6 +24,7 @@ export function Marketplace() {
   const [searchQuery, setSearchQuery] = useState("")
   const [activeCategory, setActiveCategory] = useState("all")
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState<"home" | "messages">("home")
 
   const categories = [
     { id: "programming", name: "Programming & Tech", icon: LaptopLogo, count: 15420 },
@@ -113,6 +115,11 @@ export function Marketplace() {
      service.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())))
   )
 
+  // Early return for Messages page
+  if (currentPage === "messages") {
+    return <Messages onBack={() => setCurrentPage("home")} />
+  }
+
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation Header */}
@@ -161,8 +168,13 @@ export function Marketplace() {
 
             {/* User Actions */}
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" className="hidden md:flex items-center space-x-1 hover:bg-gray-50">
-                <MessageCircle className="h-4 w-4" />
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="hidden md:flex items-center space-x-1 hover:bg-gray-50"
+                onClick={() => setCurrentPage("messages")}
+              >
+                <ChatCircle className="h-4 w-4" />
                 <span>Messages</span>
               </Button>
               <Button variant="ghost" size="sm" className="hidden md:flex items-center space-x-1 hover:bg-gray-50">
